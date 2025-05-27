@@ -37,6 +37,8 @@ export function ExpenseCalculator() {
           interestRate={calculations.interestRate}
           loanTermYears={calculations.loanTermYears}
           setPropertyPrice={calculations.setPropertyPrice}
+          setDepositPercentage={calculations.setDepositPercentage}
+          setInterestRate={calculations.setInterestRate}
         />
 
         <QuarterlyFeesSection

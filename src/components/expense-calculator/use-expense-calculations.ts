@@ -7,6 +7,8 @@ const STORAGE_KEYS = {
   STRATA: 'expense-calc-strata',
   COUNCIL: 'expense-calc-council',
   WATER: 'expense-calc-water',
+  DEPOSIT_PERCENTAGE: 'expense-calc-deposit-percentage',
+  INTEREST_RATE: 'expense-calc-interest-rate',
 };
 
 // Helper functions for localStorage
@@ -45,6 +47,8 @@ export interface ExpenseCalculations {
   setStrata: React.Dispatch<React.SetStateAction<number>>;
   setCouncil: React.Dispatch<React.SetStateAction<number>>;
   setWater: React.Dispatch<React.SetStateAction<number>>;
+  setDepositPercentage: React.Dispatch<React.SetStateAction<number>>;
+  setInterestRate: React.Dispatch<React.SetStateAction<number>>;
   resetAll: () => void;
 }
 
@@ -53,6 +57,8 @@ export function useExpenseCalculations(): ExpenseCalculations {
   const [strata, setStrata] = useState<number>(0);
   const [council, setCouncil] = useState<number>(0);
   const [water, setWater] = useState<number>(0);
+  const [depositPercentage, setDepositPercentage] = useState<number>(5);
+  const [interestRate, setInterestRate] = useState<number>(5.93);
 
   // Load from localStorage after client-side hydration
   useEffect(() => {
@@ -60,6 +66,8 @@ export function useExpenseCalculations(): ExpenseCalculations {
     setStrata(getStoredValue(STORAGE_KEYS.STRATA, 0));
     setCouncil(getStoredValue(STORAGE_KEYS.COUNCIL, 0));
     setWater(getStoredValue(STORAGE_KEYS.WATER, 0));
+    setDepositPercentage(getStoredValue(STORAGE_KEYS.DEPOSIT_PERCENTAGE, 5));
+    setInterestRate(getStoredValue(STORAGE_KEYS.INTEREST_RATE, 5.93));
   }, []);
 
   const [loanAmount, setLoanAmount] = useState<number>(0);
@@ -67,9 +75,7 @@ export function useExpenseCalculations(): ExpenseCalculations {
   const [monthlyTotal, setMonthlyTotal] = useState<number>(0);
   const [weeklyTotal, setWeeklyTotal] = useState<number>(0);
 
-  // Fixed values
-  const depositPercentage = 5;
-  const interestRate = 5.93;
+  // Fixed value
   const loanTermYears = 30;
 
   useEffect(() => {
@@ -91,7 +97,7 @@ export function useExpenseCalculations(): ExpenseCalculations {
     } else {
       setMonthlyMortgage(0);
     }
-  }, [propertyPrice]);
+  }, [propertyPrice, depositPercentage, interestRate]);
 
   useEffect(() => {
     // Convert quarterly fees to monthly by dividing by 3
@@ -137,12 +143,28 @@ export function useExpenseCalculations(): ExpenseCalculations {
     return () => clearTimeout(timeoutId);
   }, [water]);
 
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setStoredValue(STORAGE_KEYS.DEPOSIT_PERCENTAGE, depositPercentage);
+    }, 500);
+    return () => clearTimeout(timeoutId);
+  }, [depositPercentage]);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setStoredValue(STORAGE_KEYS.INTEREST_RATE, interestRate);
+    }, 500);
+    return () => clearTimeout(timeoutId);
+  }, [interestRate]);
+
   // Reset function to clear all values
   const resetAll = () => {
     setPropertyPrice(0);
     setStrata(0);
     setCouncil(0);
     setWater(0);
+    setDepositPercentage(5);
+    setInterestRate(5.93);
 
     // Clear from localStorage
     Object.values(STORAGE_KEYS).forEach((key) => {
@@ -172,6 +194,8 @@ export function useExpenseCalculations(): ExpenseCalculations {
     setStrata,
     setCouncil,
     setWater,
+    setDepositPercentage,
+    setInterestRate,
     resetAll,
   };
 }
