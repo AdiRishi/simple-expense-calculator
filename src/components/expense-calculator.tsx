@@ -83,9 +83,9 @@ export default function ExpenseCalculator() {
         </CardTitle>
         <CardDescription>Calculate your monthly and weekly property expenses</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-4 sm:space-y-6">
         {/* Property Price Section */}
-        <div className="bg-muted/50 space-y-4 rounded-lg p-4">
+        <div className="bg-muted/50 space-y-4 rounded-lg p-3 sm:p-4">
           <div className="space-y-2">
             <Label htmlFor="property-price">Property Price ($)</Label>
             <Input
@@ -99,7 +99,7 @@ export default function ExpenseCalculator() {
           </div>
 
           {propertyPrice > 0 && (
-            <div className="grid grid-cols-2 gap-4 text-sm">
+            <div className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
               <div>
                 <p className="text-muted-foreground">Deposit ({depositPercentage}%)</p>
                 <p className="font-medium">${(propertyPrice * 0.05).toLocaleString()}</p>
@@ -179,13 +179,13 @@ export default function ExpenseCalculator() {
         </div>
       </CardContent>
 
-      <CardFooter className="flex flex-col space-y-4 border-t p-6">
-        <div className="text-muted-foreground flex items-center gap-2 text-sm">
-          <Info className="h-4 w-4" />
+      <CardFooter className="flex flex-col space-y-4 border-t p-4 sm:p-6">
+        <div className="text-muted-foreground flex items-start gap-2 text-sm">
+          <Info className="mt-0.5 h-4 w-4 flex-shrink-0" />
           <span>Assumes 5% deposit and {interestRate}% variable interest rate</span>
         </div>
 
-        <div className="grid w-full grid-cols-2 gap-4">
+        <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="space-y-1">
             <p className="text-muted-foreground text-sm font-medium">Monthly Expenses</p>
             <p className="text-2xl font-bold">${Math.round(monthlyTotal).toLocaleString()}</p>
