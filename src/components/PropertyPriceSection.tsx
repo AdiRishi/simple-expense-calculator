@@ -31,6 +31,7 @@ export default function PropertyPriceSection({
           type="text"
           min="0"
           placeholder="0"
+          value={propertyPrice.toLocaleString()}
           onChange={handleInputChange(setPropertyPrice)}
           onBlur={handleInputBlur}
         />

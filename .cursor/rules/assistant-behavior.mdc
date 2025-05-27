@@ -1,0 +1,30 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Assistant Behavior Rules
+
+## Development Server
+- **NEVER** automatically run `npm run dev`, `yarn dev`, or any development server commands unless explicitly requested by the user
+- **NEVER** run commands in background mode unless specifically asked
+- Always ask the user if they want to start the dev server instead of assuming
+
+## Testing and Building
+- It's acceptable to run `npm run build` or similar build commands to check for compilation errors when requested or when it makes sense for verification
+- Always explain why you're running a build command before doing so
+
+## Terminal Commands
+- Only run terminal commands that are necessary for the specific task
+- Avoid running long-running processes without explicit user permission
+- If a command might take a while or run indefinitely, always warn the user first
+
+## Code Changes
+- Focus on making the requested changes efficiently
+- Test compilation with build commands when appropriate, but don't start servers
+- Provide clear explanations of what was changed and why
+
+## General Guidelines
+- Respect the user's development workflow
+- Don't make assumptions about what the user wants to run
+- Ask for clarification when in doubt about running commands

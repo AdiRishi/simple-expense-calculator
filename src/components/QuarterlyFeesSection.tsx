@@ -36,6 +36,7 @@ export default function QuarterlyFeesSection({
             type="text"
             min="0"
             placeholder="0.00"
+            value={strata.toLocaleString()}
             onChange={handleInputChange(setStrata)}
             onBlur={handleInputBlur}
           />
@@ -48,6 +49,7 @@ export default function QuarterlyFeesSection({
             type="text"
             min="0"
             placeholder="0.00"
+            value={council.toLocaleString()}
             onChange={handleInputChange(setCouncil)}
             onBlur={handleInputBlur}
           />
@@ -60,6 +62,7 @@ export default function QuarterlyFeesSection({
             type="text"
             min="0"
             placeholder="0.00"
+            value={water.toLocaleString()}
             onChange={handleInputChange(setWater)}
             onBlur={handleInputBlur}
           />
