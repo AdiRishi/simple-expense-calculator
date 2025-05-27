@@ -15,7 +15,7 @@ The project uses a custom UI component library built on Radix UI primitives loca
 - **Label**: [src/components/ui/label.tsx](mdc:src/components/ui/label.tsx) - Accessible form labels
 
 ### Card Component Pattern
-Follow the pattern used in [src/components/expense-calculator.tsx](mdc:src/components/expense-calculator.tsx):
+Follow the pattern used in [src/components/expense-calculator/expense-calculator.tsx](mdc:src/components/expense-calculator/expense-calculator.tsx):
 ```tsx
 <Card className="mx-auto w-full max-w-lg">
   <CardHeader>
@@ -35,7 +35,7 @@ Follow the pattern used in [src/components/expense-calculator.tsx](mdc:src/compo
 ```
 
 ### Form Input Pattern
-Use this pattern for form inputs with proper labeling and event handling:
+Use this pattern for controlled form inputs with proper labeling and event handling:
 ```tsx
 <div className="space-y-2">
   <Label htmlFor="input-id">Field Label</Label>
@@ -43,11 +43,17 @@ Use this pattern for form inputs with proper labeling and event handling:
     id="input-id"
     type="text"
     placeholder="Placeholder text"
+    value={stateValue.toLocaleString()}
     onChange={handleInputChange(setStateFunction)}
     onBlur={handleInputBlur}
   />
 </div>
 ```
+
+**Key Points:**
+- Always use controlled inputs with `value` prop tied to state
+- Use `toLocaleString()` for formatted number display
+- Import utilities from `./input-utils` for consistent input handling
 
 ### Icon Usage
 - Use Lucide React icons consistently
@@ -92,3 +98,61 @@ Use conditional rendering for progressive disclosure:
 - Borders and separators: `border-t pt-3`
 - Text emphasis: `font-medium`, `font-bold`, `text-xl`
 - Color hierarchy: `text-muted-foreground` for secondary text
+
+## Component Architecture Patterns
+
+### Custom Hooks for Business Logic
+Separate business logic into custom hooks following the pattern in [use-expense-calculations.ts](mdc:src/components/expense-calculator/use-expense-calculations.ts):
+```typescript
+export function useFeatureName(): FeatureInterface {
+  const [state, setState] = useState(defaultValue);
+
+  // useEffect for side effects
+  useEffect(() => {
+    // Business logic
+  }, [dependencies]);
+
+  return {
+    // State values
+    // State setters
+    // Computed values
+    // Action functions
+  };
+}
+```
+
+### Feature Folder Organization
+Organize related components in feature folders:
+```
+src/components/feature-name/
+├── index.tsx                    # Clean export
+├── feature-name.tsx            # Main orchestrator component
+├── use-feature-logic.ts        # Custom hook for business logic
+├── SubComponent1.tsx           # Focused sub-components
+├── SubComponent2.tsx           #
+└── utils.ts                    # Shared utilities
+```
+
+### Component Props Interface Pattern
+Define clear interfaces for component props:
+```typescript
+interface ComponentProps {
+  // Data props
+  value: number;
+  displayValue: string;
+
+  // Configuration props
+  config: ConfigType;
+
+  // Event handlers
+  onChange: React.Dispatch<React.SetStateAction<number>>;
+  onAction: () => void;
+}
+```
+
+### LocalStorage Integration Pattern
+For persistent state, follow the pattern established in the expense calculator:
+1. **Initial load**: Use `useEffect` on mount to load from localStorage
+2. **Saving**: Use debounced `useEffect` to save changes (500ms delay)
+3. **SSR safety**: Check `typeof window !== 'undefined'` before localStorage operations
+4. **Hydration safety**: Start with default values, then load from storage after mount

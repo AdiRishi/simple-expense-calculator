@@ -13,7 +13,7 @@ interface PropertyPriceSectionProps {
   setPropertyPrice: React.Dispatch<React.SetStateAction<number>>;
 }
 
-export default function PropertyPriceSection({
+export function PropertyPriceSection({
   propertyPrice,
   loanAmount,
   monthlyMortgage,

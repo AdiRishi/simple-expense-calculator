@@ -13,7 +13,7 @@ interface QuarterlyfeesSectionProps {
   setWater: React.Dispatch<React.SetStateAction<number>>;
 }
 
-export default function QuarterlyFeesSection({
+export function QuarterlyFeesSection({
   strata,
   council,
   water,

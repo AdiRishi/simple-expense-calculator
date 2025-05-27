@@ -3,9 +3,9 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Home, RotateCcw } from 'lucide-react';
-import ExpenseResults from './ExpenseResults';
-import PropertyPriceSection from './PropertyPriceSection';
-import QuarterlyFeesSection from './QuarterlyFeesSection';
+import { ExpenseResults } from './ExpenseResults';
+import { PropertyPriceSection } from './PropertyPriceSection';
+import { QuarterlyFeesSection } from './QuarterlyFeesSection';
 import { useExpenseCalculations } from './use-expense-calculations';
 
 export function ExpenseCalculator() {

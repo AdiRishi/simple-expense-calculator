@@ -7,12 +7,7 @@ interface ExpenseResultsProps {
   interestRate: number;
 }
 
-export default function ExpenseResults({
-  monthlyTotal,
-  weeklyTotal,
-  depositPercentage,
-  interestRate,
-}: ExpenseResultsProps) {
+export function ExpenseResults({ monthlyTotal, weeklyTotal, depositPercentage, interestRate }: ExpenseResultsProps) {
   return (
     <div className="flex flex-col space-y-4 border-t p-4 sm:p-6">
       <div className="text-muted-foreground flex items-start gap-2 text-sm">

@@ -6,7 +6,7 @@ alwaysApply: false
 # Calculation Logic & Business Rules
 
 ## Core Calculation Logic
-The expense calculator in [src/components/expense-calculator.tsx](mdc:src/components/expense-calculator.tsx) implements property expense calculations with the following business rules.
+The expense calculator implements property expense calculations with business logic centralized in [src/components/expense-calculator/use-expense-calculations.ts](mdc:src/components/expense-calculator/use-expense-calculations.ts).
 
 ## Fixed Parameters
 - **Deposit Percentage**: 5% of property price
@@ -77,3 +77,23 @@ This accounts for the fact that there are approximately 52.18 weeks in a year.
 - All financial inputs must be non-negative
 - Empty inputs default to 0
 - Invalid inputs (non-numeric) default to 0
+
+## Persistence & State Management
+### LocalStorage Integration
+- **Storage Keys**: Organized with `expense-calc-` prefix for namespace isolation
+- **Debounced Saving**: 500ms delay to avoid performance issues during rapid input
+- **Hydration Safety**: Initial render uses default values, localStorage loads after client mount
+- **Error Handling**: Graceful fallbacks when localStorage is unavailable
+
+### Reset Functionality
+- **Immediate Reset**: No confirmation dialog for better UX
+- **Complete Clear**: Resets both component state and localStorage
+- **UI Reset**: All input fields return to default (0) state
+
+### State Architecture
+The custom hook `useExpenseCalculations` provides:
+- **State Management**: All calculation-related state in one place
+- **Computed Values**: Derived calculations (loan amount, totals)
+- **Side Effects**: Automatic recalculation when dependencies change
+- **Actions**: Reset function and state setters
+- **Constants**: Centralized financial parameters (interest rate, loan term, etc.)
