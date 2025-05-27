@@ -1,0 +1,53 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Simple Expense Calculator - Project Overview
+
+## Purpose
+This is a Next.js application that calculates property expenses including mortgage payments and quarterly fees. It helps users estimate monthly and weekly property ownership costs.
+
+## Tech Stack
+- **Framework**: Next.js 15.3.2 with App Router
+- **Language**: TypeScript 5
+- **Styling**: Tailwind CSS 4
+- **UI Components**: Radix UI primitives with custom components
+- **Package Manager**: pnpm
+- **Icons**: Lucide React
+
+## Project Structure
+
+### Core Application Files
+- **Main Entry**: [src/app/page.tsx](mdc:src/app/page.tsx) - Homepage that renders the ExpenseCalculator component
+- **Layout**: [src/app/layout.tsx](mdc:src/app/layout.tsx) - Root layout with global styles
+- **Global Styles**: [src/app/globals.css](mdc:src/app/globals.css) - Tailwind CSS configuration and global styles
+
+### Components
+- **Main Component**: [src/components/expense-calculator.tsx](mdc:src/components/expense-calculator.tsx) - Core expense calculation logic and UI
+- **UI Components**: Located in [src/components/ui/](mdc:src/components/ui) - Reusable UI primitives
+  - [button.tsx](mdc:src/components/ui/button.tsx)
+  - [card.tsx](mdc:src/components/ui/card.tsx)
+  - [input.tsx](mdc:src/components/ui/input.tsx)
+  - [label.tsx](mdc:src/components/ui/label.tsx)
+
+### Utilities
+- **Utils**: [src/lib/utils.ts](mdc:src/lib/utils.ts) - Utility functions for class name merging
+
+### Configuration
+- **TypeScript**: [tsconfig.json](mdc:tsconfig.json) - TypeScript configuration with path aliases
+- **Package Info**: [package.json](mdc:package.json) - Dependencies and scripts
+- **Next.js Config**: [next.config.ts](mdc:next.config.ts) - Next.js configuration
+
+## Key Features
+1. **Property Price Calculator**: Calculates mortgage payments based on property price
+2. **Quarterly Fees**: Converts quarterly strata, council, and water fees to monthly/weekly
+3. **Real-time Updates**: Live calculation updates as user inputs change
+4. **Responsive Design**: Mobile-friendly interface using Tailwind CSS
+5. **Type Safety**: Full TypeScript implementation
+
+## Development Commands
+- `pnpm dev` - Start development server with Turbopack
+- `pnpm build` - Build for production
+- `pnpm lint` - Run ESLint
+- `pnpm format` - Format code with Prettier

@@ -1,0 +1,59 @@
+---
+description:
+globs:
+alwaysApply: false
+---
+# Coding Standards & Best Practices
+
+## TypeScript Guidelines
+- Use strict TypeScript configuration as defined in [tsconfig.json](mdc:tsconfig.json)
+- Always use explicit types for function parameters and return values
+- Use `type` for object shapes and `interface` for extensible contracts
+- Prefer `React.ChangeEvent<HTMLInputElement>` for form event handlers
+- Use optional chaining (`?.`) and nullish coalescing (`??`) when appropriate
+
+## React & Next.js Conventions
+- Use `'use client'` directive for client-side components that use hooks or browser APIs
+- Prefer functional components with hooks over class components
+- Use default exports for page components and named exports for utility components
+- Follow the App Router structure: pages in `src/app/`, components in `src/components/`
+- Use the `@/` path alias for imports (configured in [tsconfig.json](mdc:tsconfig.json))
+
+## Component Structure
+Follow the pattern established in [src/components/expense-calculator.tsx](mdc:src/components/expense-calculator.tsx):
+1. Import statements (external libraries first, then local imports)
+2. Type definitions
+3. Component function with proper TypeScript types
+4. State management with `useState`
+5. Side effects with `useEffect`
+6. Event handlers
+7. JSX return with proper semantic structure
+
+## State Management
+- Use `useState` for local component state
+- Use `useEffect` for side effects and computed values
+- Create custom handlers like `handleInputChange` for reusable event handling
+- Always provide proper TypeScript types for state setters
+
+## Styling Guidelines
+- Use Tailwind CSS classes exclusively (no custom CSS unless absolutely necessary)
+- Follow responsive design patterns with Tailwind breakpoints
+- Use component variants from [src/components/ui/](mdc:src/components/ui) components
+- Prefer semantic class combinations over arbitrary values
+
+## Form Handling
+- Use controlled components with `value` and `onChange`
+- Implement proper input validation and formatting
+- Use `onBlur` for formatting numbers with commas
+- Convert string inputs to numbers using `Number.parseFloat()` with fallback to 0
+
+## File Organization
+- Keep UI primitives in `src/components/ui/` following the pattern in existing files
+- Use descriptive, kebab-case filenames for components
+- Export components as default exports
+- Group related functionality in single files when appropriate
+
+## Performance Considerations
+- Use `useEffect` dependencies arrays properly to prevent unnecessary re-renders
+- Memoize expensive calculations when needed
+- Avoid inline object/function creation in JSX when possible
