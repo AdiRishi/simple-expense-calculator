@@ -8,7 +8,7 @@ import PropertyPriceSection from './PropertyPriceSection';
 import QuarterlyFeesSection from './QuarterlyFeesSection';
 import { useExpenseCalculations } from './use-expense-calculations';
 
-export default function ExpenseCalculator() {
+export function ExpenseCalculator() {
   const calculations = useExpenseCalculations();
 
   return (
