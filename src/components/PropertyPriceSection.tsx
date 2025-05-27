@@ -7,6 +7,9 @@ interface PropertyPriceSectionProps {
   propertyPrice: number;
   loanAmount: number;
   monthlyMortgage: number;
+  depositPercentage: number;
+  interestRate: number;
+  loanTermYears: number;
   setPropertyPrice: React.Dispatch<React.SetStateAction<number>>;
 }
 
@@ -14,12 +17,11 @@ export default function PropertyPriceSection({
   propertyPrice,
   loanAmount,
   monthlyMortgage,
+  depositPercentage,
+  interestRate,
+  loanTermYears,
   setPropertyPrice,
 }: PropertyPriceSectionProps) {
-  const depositPercentage = 5;
-  const interestRate = 5.93;
-  const loanTermYears = 30;
-
   return (
     <div className="bg-muted/50 space-y-4 rounded-lg p-3 sm:p-4">
       <div className="space-y-2">
@@ -38,7 +40,7 @@ export default function PropertyPriceSection({
         <div className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
           <div>
             <p className="text-muted-foreground">Deposit ({depositPercentage}%)</p>
-            <p className="font-medium">${(propertyPrice * 0.05).toLocaleString()}</p>
+            <p className="font-medium">${(propertyPrice * (depositPercentage / 100)).toLocaleString()}</p>
           </div>
           <div>
             <p className="text-muted-foreground">Loan Amount</p>

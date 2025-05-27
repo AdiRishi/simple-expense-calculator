@@ -10,6 +10,9 @@ export interface ExpenseCalculations {
   monthlyMortgage: number;
   monthlyTotal: number;
   weeklyTotal: number;
+  depositPercentage: number;
+  interestRate: number;
+  loanTermYears: number;
   setPropertyPrice: React.Dispatch<React.SetStateAction<number>>;
   setStrata: React.Dispatch<React.SetStateAction<number>>;
   setCouncil: React.Dispatch<React.SetStateAction<number>>;
@@ -33,8 +36,8 @@ export function useExpenseCalculations(): ExpenseCalculations {
   const loanTermYears = 30;
 
   useEffect(() => {
-    // Calculate loan amount (95% of property price)
-    const calculatedLoanAmount = propertyPrice * 0.95;
+    // Calculate loan amount based on deposit percentage
+    const calculatedLoanAmount = propertyPrice * (1 - depositPercentage / 100);
     setLoanAmount(calculatedLoanAmount);
 
     // Calculate monthly mortgage payment using standard mortgage formula
@@ -77,6 +80,9 @@ export function useExpenseCalculations(): ExpenseCalculations {
     monthlyMortgage,
     monthlyTotal,
     weeklyTotal,
+    depositPercentage,
+    interestRate,
+    loanTermYears,
     setPropertyPrice,
     setStrata,
     setCouncil,

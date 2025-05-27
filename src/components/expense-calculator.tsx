@@ -24,6 +24,9 @@ export default function ExpenseCalculator() {
           propertyPrice={calculations.propertyPrice}
           loanAmount={calculations.loanAmount}
           monthlyMortgage={calculations.monthlyMortgage}
+          depositPercentage={calculations.depositPercentage}
+          interestRate={calculations.interestRate}
+          loanTermYears={calculations.loanTermYears}
           setPropertyPrice={calculations.setPropertyPrice}
         />
 
@@ -37,7 +40,12 @@ export default function ExpenseCalculator() {
         />
       </CardContent>
 
-      <ExpenseResults monthlyTotal={calculations.monthlyTotal} weeklyTotal={calculations.weeklyTotal} />
+      <ExpenseResults
+        monthlyTotal={calculations.monthlyTotal}
+        weeklyTotal={calculations.weeklyTotal}
+        depositPercentage={calculations.depositPercentage}
+        interestRate={calculations.interestRate}
+      />
     </Card>
   );
 }

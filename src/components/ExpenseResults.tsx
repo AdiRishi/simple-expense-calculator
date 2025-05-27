@@ -3,16 +3,23 @@ import { Info } from 'lucide-react';
 interface ExpenseResultsProps {
   monthlyTotal: number;
   weeklyTotal: number;
+  depositPercentage: number;
+  interestRate: number;
 }
 
-export default function ExpenseResults({ monthlyTotal, weeklyTotal }: ExpenseResultsProps) {
-  const interestRate = 5.93;
-
+export default function ExpenseResults({
+  monthlyTotal,
+  weeklyTotal,
+  depositPercentage,
+  interestRate,
+}: ExpenseResultsProps) {
   return (
     <div className="flex flex-col space-y-4 border-t p-4 sm:p-6">
       <div className="text-muted-foreground flex items-start gap-2 text-sm">
         <Info className="mt-0.5 h-4 w-4 flex-shrink-0" />
-        <span>Assumes 5% deposit and {interestRate}% variable interest rate</span>
+        <span>
+          Assumes {depositPercentage}% deposit and {interestRate}% variable interest rate
+        </span>
       </div>
 
       <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2">
