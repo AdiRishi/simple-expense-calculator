@@ -139,25 +139,21 @@ export function useExpenseCalculations(): ExpenseCalculations {
 
   // Reset function to clear all values
   const resetAll = () => {
-    const confirmReset = window.confirm('Are you sure you want to reset all values? This action cannot be undone.');
+    setPropertyPrice(0);
+    setStrata(0);
+    setCouncil(0);
+    setWater(0);
 
-    if (confirmReset) {
-      setPropertyPrice(0);
-      setStrata(0);
-      setCouncil(0);
-      setWater(0);
-
-      // Clear from localStorage
-      Object.values(STORAGE_KEYS).forEach((key) => {
-        if (typeof window !== 'undefined') {
-          try {
-            localStorage.removeItem(key);
-          } catch {
-            // Silently fail if localStorage is not available
-          }
+    // Clear from localStorage
+    Object.values(STORAGE_KEYS).forEach((key) => {
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.removeItem(key);
+        } catch {
+          // Silently fail if localStorage is not available
         }
-      });
-    }
+      }
+    });
   };
 
   return {
