@@ -1,8 +1,7 @@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import type React from 'react';
-import { useState, useEffect } from 'react';
-import { handleInputChange, handleInputBlur } from './input-utils';
+import { handleInputChange, handleInputBlur, useFormattedNumberInput } from './input-utils';
 
 interface PropertyPriceSectionProps {
   propertyPrice: number;
@@ -27,37 +26,12 @@ export function PropertyPriceSection({
   setDepositPercentage,
   setInterestRate,
 }: PropertyPriceSectionProps) {
-  // Local state to preserve the raw string the user types for the interest rate so we don't prematurely strip the decimal point
-  const [interestRateInput, setInterestRateInput] = useState<string>(() => interestRate.toLocaleString());
-
-  // Keep the local input string in sync when the numeric prop changes externally (e.g. when resetting all values)
-  useEffect(() => {
-    setInterestRateInput(interestRate.toLocaleString());
-  }, [interestRate]);
-
-  // Custom onChange handler that updates both the display string and the numeric state used for calculations
-  const handleInterestRateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const raw = e.target.value;
-    // Always reflect whatever the user typed so far
-    setInterestRateInput(raw);
-
-    const numericValue = Number.parseFloat(raw.replace(/,/g, ''));
-    if (!Number.isNaN(numericValue)) {
-      setInterestRate(numericValue);
-    }
-  };
-
-  // On blur, format the number nicely while preserving decimal places
-  const handleInterestRateBlur = () => {
-    const numericValue = Number.parseFloat(interestRateInput.replace(/,/g, ''));
-    if (!Number.isNaN(numericValue)) {
-      setInterestRateInput(numericValue.toLocaleString());
-      setInterestRate(numericValue);
-    } else {
-      // If the input couldn't be parsed, reset to the current numeric value
-      setInterestRateInput(interestRate.toLocaleString());
-    }
-  };
+  // Use the reusable hook to handle decimals gracefully without cluttering this component
+  const {
+    input: interestRateInput,
+    onChange: handleInterestRateChange,
+    onBlur: handleInterestRateBlur,
+  } = useFormattedNumberInput(interestRate, setInterestRate);
 
   return (
     <div className="bg-muted/50 space-y-4 rounded-lg p-3 sm:p-4">
