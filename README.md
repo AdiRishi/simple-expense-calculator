@@ -19,7 +19,7 @@ The calculator uses the following assumptions and formulas:
 
 - **Deposit**: 5% of property price
 - **Loan Amount**: 95% of property price
-- **Interest Rate**: 5.93% per annum (variable)
+- **Interest Rate**: 5.68% per annum (variable)
 - **Loan Term**: 30 years
 - **Formula**: Standard mortgage payment formula with compound interest
 

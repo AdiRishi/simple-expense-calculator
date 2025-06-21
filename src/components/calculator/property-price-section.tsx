@@ -68,7 +68,7 @@ export function PropertyPriceSection({
             id="interest-rate"
             type="text"
             min="0"
-            placeholder="5.93"
+            placeholder="5.68"
             value={interestRateInput}
             onChange={handleInterestRateChange}
             onBlur={handleInterestRateBlur}

@@ -10,7 +10,7 @@ The expense calculator implements property expense calculations with business lo
 
 ## Fixed Parameters
 - **Deposit Percentage**: 5% of property price
-- **Interest Rate**: 5.93% per annum (variable)
+- **Interest Rate**: 5.68% per annum (variable)
 - **Loan Term**: 30 years
 - **Loan Amount**: 95% of property price (property price minus deposit)
 

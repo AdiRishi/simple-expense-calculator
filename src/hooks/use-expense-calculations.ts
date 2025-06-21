@@ -61,7 +61,7 @@ export function useExpenseCalculations(): ExpenseCalculations {
   const [council, setCouncil] = useState<number>(0);
   const [water, setWater] = useState<number>(0);
   const [depositPercentage, setDepositPercentage] = useState<number>(5);
-  const [interestRate, setInterestRate] = useState<number>(5.93);
+  const [interestRate, setInterestRate] = useState<number>(5.68);
   const [additionalRepayment, setAdditionalRepayment] = useState<number>(0);
 
   // Load from localStorage after client-side hydration
@@ -71,7 +71,7 @@ export function useExpenseCalculations(): ExpenseCalculations {
     setCouncil(getStoredValue(STORAGE_KEYS.COUNCIL, 0));
     setWater(getStoredValue(STORAGE_KEYS.WATER, 0));
     setDepositPercentage(getStoredValue(STORAGE_KEYS.DEPOSIT_PERCENTAGE, 5));
-    setInterestRate(getStoredValue(STORAGE_KEYS.INTEREST_RATE, 5.93));
+    setInterestRate(getStoredValue(STORAGE_KEYS.INTEREST_RATE, 5.68));
     setAdditionalRepayment(getStoredValue(STORAGE_KEYS.ADDITIONAL_REPAYMENT, 0));
   }, []);
 
@@ -176,7 +176,7 @@ export function useExpenseCalculations(): ExpenseCalculations {
     setCouncil(0);
     setWater(0);
     setDepositPercentage(5);
-    setInterestRate(5.93);
+    setInterestRate(5.68);
     setAdditionalRepayment(0);
 
     // Clear from localStorage
