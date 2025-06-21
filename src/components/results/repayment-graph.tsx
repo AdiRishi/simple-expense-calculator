@@ -11,10 +11,10 @@ import {
 import type { ChartConfig } from '@/components/ui/chart';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useRepaymentCalculations } from '@/hooks/use-repayment-calculations';
+import { handleInputChange, handleInputBlur } from '@/lib/input-utils';
 import { TrendingDown } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid } from 'recharts';
-import { handleInputChange, handleInputBlur } from './input-utils';
-import { useRepaymentCalculations } from './use-repayment-calculations';
 
 interface RepaymentGraphProps {
   loanAmount: number;

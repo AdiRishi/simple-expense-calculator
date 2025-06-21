@@ -1,4 +1,4 @@
-import { ExpenseCalculator } from '@/components/expense-calculator';
+import { ExpenseCalculator } from '@/components/calculator';
 
 export default function Home() {
   return (

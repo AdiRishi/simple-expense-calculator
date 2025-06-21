@@ -1,13 +1,13 @@
 'use client';
 
+import { ExpenseResults } from '@/components/results/expense-results';
+import { RepaymentGraph } from '@/components/results/repayment-graph';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useExpenseCalculations } from '@/hooks/use-expense-calculations';
 import { Home, RotateCcw } from 'lucide-react';
-import { ExpenseResults } from './ExpenseResults';
-import { PropertyPriceSection } from './PropertyPriceSection';
-import { QuarterlyFeesSection } from './QuarterlyFeesSection';
-import { RepaymentGraph } from './RepaymentGraph';
-import { useExpenseCalculations } from './use-expense-calculations';
+import { PropertyPriceSection } from './property-price-section';
+import { QuarterlyFeesSection } from './quarterly-fees-section';
 
 export function ExpenseCalculator() {
   const calculations = useExpenseCalculations();

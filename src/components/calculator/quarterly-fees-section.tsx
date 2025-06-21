@@ -1,8 +1,8 @@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { handleInputChange, handleInputBlur } from '@/lib/input-utils';
 import { Calculator } from 'lucide-react';
 import type React from 'react';
-import { handleInputChange, handleInputBlur } from './input-utils';
 
 interface QuarterlyfeesSectionProps {
   strata: number;

@@ -1,7 +1,7 @@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { handleInputChange, handleInputBlur, useFormattedNumberInput } from '@/lib/input-utils';
 import type React from 'react';
-import { handleInputChange, handleInputBlur, useFormattedNumberInput } from './input-utils';
 
 interface PropertyPriceSectionProps {
   propertyPrice: number;
