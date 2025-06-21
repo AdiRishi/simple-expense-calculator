@@ -56,6 +56,13 @@ export function RepaymentGraph({
     }
 
     const monthlyRate = interestRate / 100 / 12;
+
+    // Check if the monthly payment is sufficient to cover interest
+    const initialMonthlyInterest = loanAmount * monthlyRate;
+    if (monthlyMortgage <= initialMonthlyInterest) {
+      return []; // Return empty data if payment is insufficient
+    }
+
     const data: RepaymentData[] = [];
 
     // Calculate standard repayment schedule
@@ -69,12 +76,20 @@ export function RepaymentGraph({
         withExtraBalance: Math.max(0, Math.round(withExtraBalance)),
       });
 
+      // Stop if both balances are zero
+      if (standardBalance <= 0 && withExtraBalance <= 0) {
+        break;
+      }
+
       // Calculate 12 months of payments for this year
-      for (let month = 0; month < 12 && year < loanTermYears; month++) {
+      for (let month = 0; month < 12; month++) {
         // Standard repayment
         if (standardBalance > 0) {
           const standardInterestPayment = standardBalance * monthlyRate;
           const standardPrincipalPayment = monthlyMortgage - standardInterestPayment;
+
+          if (standardPrincipalPayment <= 0) break; // Safety check for negative amortization
+
           standardBalance = Math.max(0, standardBalance - standardPrincipalPayment);
         }
 
@@ -82,7 +97,15 @@ export function RepaymentGraph({
         if (withExtraBalance > 0) {
           const extraInterestPayment = withExtraBalance * monthlyRate;
           const extraPrincipalPayment = monthlyMortgage - extraInterestPayment + additionalRepayment;
+
+          if (extraPrincipalPayment <= 0) break; // Safety check for negative amortization
+
           withExtraBalance = Math.max(0, withExtraBalance - extraPrincipalPayment);
+        }
+
+        // Stop early if both loans are paid off
+        if (standardBalance <= 0 && withExtraBalance <= 0) {
+          break;
         }
       }
     }
@@ -107,16 +130,33 @@ export function RepaymentGraph({
 
     const monthlyRate = interestRate / 100 / 12;
 
+    // Check if the monthly payment is sufficient to cover interest on the initial loan
+    const initialMonthlyInterest = loanAmount * monthlyRate;
+    if (monthlyMortgage <= initialMonthlyInterest) {
+      // Payment is insufficient - return zero values to avoid infinite loops
+      return {
+        standardTotalRepayments: 0,
+        standardTotalInterest: 0,
+        extraTotalRepayments: 0,
+        extraTotalInterest: 0,
+        timeSavedYears: 0,
+        timeSavedMonths: 0,
+        interestSaved: 0,
+        standardTermMonths: 0,
+        extraTermMonths: 0,
+      };
+    }
+
     // Calculate standard loan metrics
     let standardBalance = loanAmount;
     let standardTotalInterestPaid = 0;
     let standardMonths = 0;
 
-    while (standardBalance > 0 && standardMonths < loanTermYears * 12) {
+    while (standardBalance > 0.01 && standardMonths < loanTermYears * 12) {
       const interestPayment = standardBalance * monthlyRate;
       const principalPayment = monthlyMortgage - interestPayment;
 
-      if (principalPayment <= 0) break; // Safety check
+      if (principalPayment <= 0) break; // Safety check for negative amortization
 
       standardTotalInterestPaid += interestPayment;
       standardBalance = Math.max(0, standardBalance - principalPayment);
@@ -132,11 +172,11 @@ export function RepaymentGraph({
     let extraTotalAdditionalPayments = 0;
 
     if (additionalRepayment > 0) {
-      while (extraBalance > 0 && extraMonths < loanTermYears * 12) {
+      while (extraBalance > 0.01 && extraMonths < loanTermYears * 12) {
         const interestPayment = extraBalance * monthlyRate;
         const principalPayment = monthlyMortgage - interestPayment + additionalRepayment;
 
-        if (principalPayment <= 0) break; // Safety check
+        if (principalPayment <= 0) break; // Safety check for negative amortization
 
         extraTotalInterestPaid += interestPayment;
         extraTotalAdditionalPayments += additionalRepayment;
