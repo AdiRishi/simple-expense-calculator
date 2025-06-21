@@ -90,21 +90,81 @@ export function RepaymentGraph({
     return data;
   }, [loanAmount, monthlyMortgage, interestRate, loanTermYears, additionalRepayment]);
 
-  const savings = useMemo(() => {
-    if (repaymentData.length === 0) return { timeSaved: 0, interestSaved: 0 };
+  const loanMetrics = useMemo(() => {
+    if (loanAmount <= 0 || monthlyMortgage <= 0) {
+      return {
+        standardTotalRepayments: 0,
+        standardTotalInterest: 0,
+        extraTotalRepayments: 0,
+        extraTotalInterest: 0,
+        timeSavedYears: 0,
+        timeSavedMonths: 0,
+        interestSaved: 0,
+        standardTermMonths: 0,
+        extraTermMonths: 0,
+      };
+    }
 
-    // Find when each loan is paid off
-    const standardPayoffYear = repaymentData.findIndex((d) => d.standardBalance === 0);
-    const extraPayoffYear = repaymentData.findIndex((d) => d.withExtraBalance === 0);
+    const monthlyRate = interestRate / 100 / 12;
 
-    const timeSaved = standardPayoffYear > 0 && extraPayoffYear > 0 ? standardPayoffYear - extraPayoffYear : 0;
+    // Calculate standard loan metrics
+    let standardBalance = loanAmount;
+    let standardTotalInterestPaid = 0;
+    let standardMonths = 0;
 
-    // Calculate total interest saved (simplified calculation)
-    const totalAdditionalPayments = additionalRepayment * 12 * (extraPayoffYear > 0 ? extraPayoffYear : loanTermYears);
-    const interestSaved = timeSaved * 12 * monthlyMortgage - totalAdditionalPayments;
+    while (standardBalance > 0 && standardMonths < loanTermYears * 12) {
+      const interestPayment = standardBalance * monthlyRate;
+      const principalPayment = monthlyMortgage - interestPayment;
 
-    return { timeSaved, interestSaved: Math.max(0, interestSaved) };
-  }, [repaymentData, additionalRepayment, monthlyMortgage, loanTermYears]);
+      if (principalPayment <= 0) break; // Safety check
+
+      standardTotalInterestPaid += interestPayment;
+      standardBalance = Math.max(0, standardBalance - principalPayment);
+      standardMonths++;
+    }
+
+    const standardTotalRepayments = standardMonths * monthlyMortgage;
+
+    // Calculate extra repayment loan metrics (only if additional repayment > 0)
+    let extraBalance = loanAmount;
+    let extraTotalInterestPaid = 0;
+    let extraMonths = 0;
+    let extraTotalAdditionalPayments = 0;
+
+    if (additionalRepayment > 0) {
+      while (extraBalance > 0 && extraMonths < loanTermYears * 12) {
+        const interestPayment = extraBalance * monthlyRate;
+        const principalPayment = monthlyMortgage - interestPayment + additionalRepayment;
+
+        if (principalPayment <= 0) break; // Safety check
+
+        extraTotalInterestPaid += interestPayment;
+        extraTotalAdditionalPayments += additionalRepayment;
+        extraBalance = Math.max(0, extraBalance - principalPayment);
+        extraMonths++;
+      }
+    }
+
+    const extraTotalRepayments = extraMonths * monthlyMortgage + extraTotalAdditionalPayments;
+
+    // Calculate time saved in years and months
+    const monthsSaved = standardMonths - extraMonths;
+    const timeSavedYears = Math.floor(monthsSaved / 12);
+    const timeSavedMonths = monthsSaved % 12;
+    const interestSaved = standardTotalInterestPaid - extraTotalInterestPaid;
+
+    return {
+      standardTotalRepayments,
+      standardTotalInterest: standardTotalInterestPaid,
+      extraTotalRepayments,
+      extraTotalInterest: extraTotalInterestPaid,
+      timeSavedYears,
+      timeSavedMonths,
+      interestSaved: Math.max(0, interestSaved),
+      standardTermMonths: standardMonths,
+      extraTermMonths: extraMonths,
+    };
+  }, [loanAmount, monthlyMortgage, interestRate, loanTermYears, additionalRepayment]);
 
   if (loanAmount <= 0) {
     return null;
@@ -137,18 +197,80 @@ export function RepaymentGraph({
           />
         </div>
 
-        {additionalRepayment > 0 && savings.timeSaved > 0 && (
-          <div className="bg-muted/50 grid grid-cols-1 gap-4 rounded-lg p-4 text-sm sm:grid-cols-2">
-            <div>
-              <p className="text-muted-foreground">Time Saved</p>
-              <p className="font-medium text-green-600">{savings.timeSaved} years</p>
-            </div>
-            <div>
-              <p className="text-muted-foreground">Interest Saved</p>
-              <p className="font-medium text-green-600">${Math.round(savings.interestSaved).toLocaleString()}</p>
+        {/* Loan Summary Information */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold">Your monthly repayments</h3>
+
+          <div className="bg-muted/50 rounded-lg p-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+              {/* Row 1 */}
+              <div>
+                <p className="text-muted-foreground text-xs">Principal and interest repayments</p>
+                <p className="text-lg font-bold">${monthlyMortgage.toFixed(0)}</p>
+                {additionalRepayment > 0 && (
+                  <p className="text-muted-foreground text-xs">+ ${additionalRepayment.toLocaleString()} extra</p>
+                )}
+              </div>
+
+              <div>
+                <p className="text-muted-foreground text-xs">Interest rate</p>
+                <p className="text-lg font-bold">{interestRate.toFixed(2)} % p.a</p>
+              </div>
+
+              <div>
+                <p className="text-muted-foreground text-xs">Total loan repayments (standard)</p>
+                <p className="text-lg font-bold">${Math.round(loanMetrics.standardTotalRepayments).toLocaleString()}</p>
+              </div>
+
+              {/* Row 2 */}
+              <div>
+                <p className="text-muted-foreground text-xs">Total interest charged (standard)</p>
+                <p className="text-lg font-bold">${Math.round(loanMetrics.standardTotalInterest).toLocaleString()}</p>
+              </div>
+
+              {additionalRepayment > 0 && (
+                <>
+                  <div>
+                    <p className="text-muted-foreground text-xs">Total loan repayments (extra)</p>
+                    <p className="text-lg font-bold text-green-600">
+                      ${Math.round(loanMetrics.extraTotalRepayments).toLocaleString()}
+                    </p>
+                  </div>
+
+                  <div>
+                    <p className="text-muted-foreground text-xs">Total interest charged (extra)</p>
+                    <p className="text-lg font-bold text-green-600">
+                      ${Math.round(loanMetrics.extraTotalInterest).toLocaleString()}
+                    </p>
+                  </div>
+                </>
+              )}
+
+              {/* Row 3 (only show if there are savings) */}
+              {additionalRepayment > 0 && loanMetrics.interestSaved > 0 && (
+                <div>
+                  <p className="text-muted-foreground text-xs">Total interest saved</p>
+                  <p className="text-lg font-bold text-green-600">
+                    ${Math.round(loanMetrics.interestSaved).toLocaleString()}
+                  </p>
+                </div>
+              )}
+
+              {additionalRepayment > 0 && (loanMetrics.timeSavedYears > 0 || loanMetrics.timeSavedMonths > 0) && (
+                <div>
+                  <p className="text-muted-foreground text-xs">Loan term reduction</p>
+                  <p className="text-lg font-bold text-green-600">
+                    {loanMetrics.timeSavedYears > 0 &&
+                      `${loanMetrics.timeSavedYears} year${loanMetrics.timeSavedYears !== 1 ? 's' : ''}`}
+                    {loanMetrics.timeSavedYears > 0 && loanMetrics.timeSavedMonths > 0 && ', '}
+                    {loanMetrics.timeSavedMonths > 0 &&
+                      `${loanMetrics.timeSavedMonths} month${loanMetrics.timeSavedMonths !== 1 ? 's' : ''}`}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
-        )}
+        </div>
 
         <ChartContainer config={chartConfig} className="h-[400px] w-full">
           <AreaChart accessibilityLayer data={repaymentData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
