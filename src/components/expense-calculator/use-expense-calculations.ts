@@ -9,6 +9,7 @@ const STORAGE_KEYS = {
   WATER: 'expense-calc-water',
   DEPOSIT_PERCENTAGE: 'expense-calc-deposit-percentage',
   INTEREST_RATE: 'expense-calc-interest-rate',
+  ADDITIONAL_REPAYMENT: 'expense-calc-additional-repayment',
 };
 
 // Helper functions for localStorage
@@ -43,12 +44,14 @@ export interface ExpenseCalculations {
   depositPercentage: number;
   interestRate: number;
   loanTermYears: number;
+  additionalRepayment: number;
   setPropertyPrice: React.Dispatch<React.SetStateAction<number>>;
   setStrata: React.Dispatch<React.SetStateAction<number>>;
   setCouncil: React.Dispatch<React.SetStateAction<number>>;
   setWater: React.Dispatch<React.SetStateAction<number>>;
   setDepositPercentage: React.Dispatch<React.SetStateAction<number>>;
   setInterestRate: React.Dispatch<React.SetStateAction<number>>;
+  setAdditionalRepayment: React.Dispatch<React.SetStateAction<number>>;
   resetAll: () => void;
 }
 
@@ -59,6 +62,7 @@ export function useExpenseCalculations(): ExpenseCalculations {
   const [water, setWater] = useState<number>(0);
   const [depositPercentage, setDepositPercentage] = useState<number>(5);
   const [interestRate, setInterestRate] = useState<number>(5.93);
+  const [additionalRepayment, setAdditionalRepayment] = useState<number>(0);
 
   // Load from localStorage after client-side hydration
   useEffect(() => {
@@ -68,6 +72,7 @@ export function useExpenseCalculations(): ExpenseCalculations {
     setWater(getStoredValue(STORAGE_KEYS.WATER, 0));
     setDepositPercentage(getStoredValue(STORAGE_KEYS.DEPOSIT_PERCENTAGE, 5));
     setInterestRate(getStoredValue(STORAGE_KEYS.INTEREST_RATE, 5.93));
+    setAdditionalRepayment(getStoredValue(STORAGE_KEYS.ADDITIONAL_REPAYMENT, 0));
   }, []);
 
   const [loanAmount, setLoanAmount] = useState<number>(0);
@@ -157,6 +162,13 @@ export function useExpenseCalculations(): ExpenseCalculations {
     return () => clearTimeout(timeoutId);
   }, [interestRate]);
 
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setStoredValue(STORAGE_KEYS.ADDITIONAL_REPAYMENT, additionalRepayment);
+    }, 500);
+    return () => clearTimeout(timeoutId);
+  }, [additionalRepayment]);
+
   // Reset function to clear all values
   const resetAll = () => {
     setPropertyPrice(0);
@@ -165,6 +177,7 @@ export function useExpenseCalculations(): ExpenseCalculations {
     setWater(0);
     setDepositPercentage(5);
     setInterestRate(5.93);
+    setAdditionalRepayment(0);
 
     // Clear from localStorage
     Object.values(STORAGE_KEYS).forEach((key) => {
@@ -190,12 +203,14 @@ export function useExpenseCalculations(): ExpenseCalculations {
     depositPercentage,
     interestRate,
     loanTermYears,
+    additionalRepayment,
     setPropertyPrice,
     setStrata,
     setCouncil,
     setWater,
     setDepositPercentage,
     setInterestRate,
+    setAdditionalRepayment,
     resetAll,
   };
 }
