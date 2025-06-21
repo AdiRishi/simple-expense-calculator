@@ -3,95 +3,147 @@ description:
 globs:
 alwaysApply: false
 ---
-# Coding Standards & Best Practices
+# Coding Standards - Simple Expense Calculator
 
-## TypeScript Guidelines
-- Use strict TypeScript configuration as defined in [tsconfig.json](mdc:tsconfig.json)
-- Always use explicit types for function parameters and return values
-- Use `type` for object shapes and `interface` for extensible contracts
-- Prefer `React.ChangeEvent<HTMLInputElement>` for form event handlers
-- Use optional chaining (`?.`) and nullish coalescing (`??`) when appropriate
+## TypeScript Standards
 
-## React & Next.js Conventions
-- Use `'use client'` directive for client-side components that use hooks or browser APIs
-- Prefer functional components with hooks over class components
-- **Always use named exports** for all components, hooks, and utilities
-- **Exception**: Next.js pages (`src/app/page.tsx`, `src/app/layout.tsx`) must use default exports (Next.js requirement)
-- Follow the App Router structure: pages in `src/app/`, components in `src/components/`
-- Use the `@/` path alias for imports (configured in [tsconfig.json](mdc:tsconfig.json))
+### Type Definitions
+- Use `interface` for props and data structures
+- Import types with `type` keyword: `import type React from 'react'`
+- Define strict prop interfaces for all components
+- Use React.Dispatch<React.SetStateAction<T>> for state setters
 
-## Component Structure
-### Main Components
-Follow the pattern established in [src/components/expense-calculator/expense-calculator.tsx](mdc:src/components/expense-calculator/expense-calculator.tsx):
-1. Import statements (external libraries first, then local imports)
-2. Component function with minimal logic (orchestration only)
-3. Custom hook usage for business logic
-4. JSX return with proper semantic structure
+### Example Interface Pattern
+```typescript
+interface ComponentProps {
+  value: number;
+  setValue: React.Dispatch<React.SetStateAction<number>>;
+  isLoading?: boolean; // Optional props with default values
+}
+```
 
-### Custom Hooks
-Follow the pattern in [src/components/expense-calculator/use-expense-calculations.ts](mdc:src/components/expense-calculator/use-expense-calculations.ts):
-1. Import statements
-2. Constants and helper functions
-3. Interface definitions
-4. Hook function with TypeScript return type
-5. State declarations
-6. useEffect blocks for side effects
-7. Utility functions (reset, etc.)
-8. Return object with properly typed interface
+### Function Components
+- Use function declarations: `export function ComponentName() {}`
+- Return JSX directly without unnecessary React.FC wrapper
+- Destructure props in function parameters for clarity
 
-## State Management
-### Component-Level State
-- Use `useState` for local component state
-- Prefer custom hooks for complex business logic
-- Always provide proper TypeScript types for state setters
+## React Patterns
 
-### Custom Hooks for Business Logic
-- Extract business logic into custom hooks (e.g., `useExpenseCalculations`)
-- Use `useEffect` for side effects and computed values
-- Return well-typed interfaces from custom hooks
-- Handle localStorage operations within hooks, not components
+### Hooks Usage
+- Custom hooks in [src/hooks/](mdc:src/hooks) directory
+- Use `useState` and `useEffect` for component state
+- Implement cleanup in useEffect when needed
+- Debounce localStorage updates to improve performance
 
-### Shared Utilities
-- Create reusable utility functions (e.g., `handleInputChange`, `handleInputBlur`)
-- Place shared utilities in appropriate files (e.g., `input-utils.ts`)
-- Use proper TypeScript types for utility functions
+### State Management
+- Centralize related state in custom hooks
+- Pass state setters as props to child components
+- Use derived state for calculations
+- Implement reset functionality for form-like components
 
-## Styling Guidelines
-- Use Tailwind CSS classes exclusively (no custom CSS unless absolutely necessary)
-- Follow responsive design patterns with Tailwind breakpoints
-- Use component variants from [src/components/ui/](mdc:src/components/ui) components
-- Prefer semantic class combinations over arbitrary values
+### Component Structure
+```typescript
+'use client'; // For client-side components
 
-## Form Handling
-- **Always use controlled components** with `value` and `onChange` props
-- Use `toLocaleString()` for displaying formatted numbers in inputs
-- Implement proper input validation and formatting
-- Use `onBlur` for final formatting after user stops typing
-- Convert string inputs to numbers using `Number.parseFloat()` with fallback to 0
-- Extract input handling into reusable utilities
+import { ComponentName } from '@/components/...';
+import { hookName } from '@/hooks/...';
 
-## File Organization
-### Feature-Based Organization
-- Group related components in feature folders under `src/components/`
-- Use `index.tsx` files for clean exports from feature folders
-- Separate business logic into custom hooks
-- Create utility files for shared functionality within features
+export function MyComponent() {
+  const { state, setState } = hookName();
 
-### Naming Conventions
-- **Feature folders**: kebab-case (e.g., `expense-calculator/`)
-- **Component files**: PascalCase (e.g., `ExpenseResults.tsx`)
-- **Hook files**: camelCase with `use` prefix (e.g., `use-expense-calculations.ts`)
-- **Utility files**: kebab-case (e.g., `input-utils.ts`)
+  return (
+    <div className="...">
+      {/* JSX content */}
+    </div>
+  );
+}
+```
 
-### Export Patterns
-- **Always use named exports** - never use default exports
-- Components: `export function ComponentName() {}`
-- Hooks: `export function useHookName() {}`
-- Utilities: `export const functionName = () => {}`
-- Types/Interfaces: `export interface InterfaceName {}`
-- Index files: Re-export with named exports: `export { ComponentName } from './component-name'`
+## Import Organization
+
+### Import Order (using Prettier plugin)
+1. React and Next.js imports
+2. Third-party libraries
+3. Internal components (`@/components/...`)
+4. Internal hooks (`@/hooks/...`)
+5. Internal utilities (`@/lib/...`)
+6. Type-only imports at the end
+
+### Path Aliases
+- Use `@/` for src directory: `@/components`, `@/hooks`, `@/lib`
+- Relative imports only for same directory files
+
+## Styling Standards
+
+### Tailwind CSS
+- Use utility classes for styling
+- Follow responsive design patterns: `space-y-4 sm:space-y-6`
+- Use semantic color tokens: `text-muted-foreground`, `bg-muted/50`
+- Implement consistent spacing and sizing
+
+### Component Variants
+- Use [src/lib/utils.ts](mdc:src/lib/utils.ts) `cn()` function for conditional classes
+- Follow shadcn/ui conventions for component styling
+- Maintain consistent visual hierarchy
+
+## File Naming
+
+### Conventions
+- Use kebab-case for file names: `expense-calculator.tsx`
+- Match component name to file name
+- Use `index.tsx` for directory exports
+- Hook files: `use-[name].ts`
+
+### Directory Structure
+- Components grouped by feature in subdirectories
+- Separate UI components from business logic components
+- Hooks and utilities in dedicated directories
+
+## Error Handling
+
+### Input Validation
+- Use [src/lib/input-utils.ts](mdc:src/lib/input-utils.ts) for number input handling
+- Implement graceful fallbacks for invalid inputs
+- Handle localStorage errors silently
+
+### Calculation Safety
+- Check for zero values before mathematical operations
+- Provide sensible defaults for empty states
+- Use optional chaining and nullish coalescing where appropriate
 
 ## Performance Considerations
-- Use `useEffect` dependencies arrays properly to prevent unnecessary re-renders
-- Memoize expensive calculations when needed
-- Avoid inline object/function creation in JSX when possible
+
+### useEffect Dependencies
+- Include all used variables in dependency arrays
+- Use debouncing for expensive operations (localStorage writes)
+- Implement cleanup functions for timers and subscriptions
+
+### Conditional Rendering
+- Use early returns for complex conditions
+- Implement loading states where appropriate
+- Optimize re-renders with proper dependency management
+
+## Code Formatting
+
+### Prettier Configuration
+- 2-space indentation
+- Single quotes for strings
+- Trailing commas where valid
+- Line length limit enforced
+
+### ESLint Rules
+- Follow Next.js recommended configuration
+- Enforce TypeScript strict mode
+- Maintain consistent code style across the project
+
+## Documentation
+
+### Component Documentation
+- Use descriptive prop names and interfaces
+- Include JSDoc comments for complex functions
+- Maintain up-to-date README with usage examples
+
+### Code Comments
+- Explain calculation formulas and business logic
+- Document non-obvious implementation decisions
+- Keep comments concise and relevant

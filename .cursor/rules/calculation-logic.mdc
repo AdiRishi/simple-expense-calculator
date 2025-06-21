@@ -3,97 +3,108 @@ description:
 globs:
 alwaysApply: false
 ---
-# Calculation Logic & Business Rules
+# Calculation Logic - Simple Expense Calculator
 
-## Core Calculation Logic
-The expense calculator implements property expense calculations with business logic centralized in [src/components/expense-calculator/use-expense-calculations.ts](mdc:src/components/expense-calculator/use-expense-calculations.ts).
+## Core Calculation Hook
+[src/hooks/use-expense-calculations.ts](mdc:src/hooks/use-expense-calculations.ts) - Central calculation logic with React state management
 
-## Fixed Parameters
-- **Deposit Percentage**: 5% of property price
-- **Interest Rate**: 5.68% per annum (variable)
-- **Loan Term**: 30 years
-- **Loan Amount**: 95% of property price (property price minus deposit)
+## Mortgage Calculation
 
-## Mortgage Payment Formula
-Uses the standard mortgage payment formula:
+### Standard Mortgage Formula
 ```
 M = P * [r(1+r)^n] / [(1+r)^n - 1]
 ```
 Where:
-- `M` = Monthly mortgage payment
-- `P` = Principal loan amount (95% of property price)
-- `r` = Monthly interest rate (annual rate / 12)
-- `n` = Total number of payments (years * 12)
+- M = Monthly payment
+- P = Principal loan amount
+- r = Monthly interest rate (annual rate / 12)
+- n = Total number of payments (years × 12)
+
+### Default Assumptions
+- **Loan Term**: 30 years (fixed)
+- **Deposit**: 5% of property price (adjustable)
+- **Interest Rate**: 5.68% per annum (adjustable)
+- **Payment Type**: Principal and interest
 
 ### Implementation Details
+- Loan amount = Property price × (1 - deposit percentage / 100)
+- Monthly interest rate = Annual rate / 100 / 12
+- Number of payments = 30 × 12 = 360
+
+## Quarterly Fees Conversion
+
+### Monthly Conversion
+- Strata fees: Quarterly amount ÷ 3
+- Council rates: Quarterly amount ÷ 3
+- Water fees: Quarterly amount ÷ 3
+
+### Rationale
+Australian property fees are typically charged quarterly, but users need monthly budgets for comparison with mortgage payments.
+
+## Weekly Calculation
+
+### Formula
+```
+Weekly expenses = (Monthly total × 12) ÷ 52
+```
+
+### Rationale
+Provides accurate weekly amount accounting for varying month lengths throughout the year.
+
+## Additional Repayment Calculations
+
+### Impact Analysis
+- [src/hooks/use-repayment-calculations.ts](mdc:src/hooks/use-repayment-calculations.ts) - Calculates loan balance over time
+- Shows how additional payments reduce total interest and loan term
+- Generates data for repayment graph visualization
+
+### Amortization Schedule
+- Tracks principal vs interest portions over loan term
+- Calculates remaining balance after each payment
+- Compares standard vs accelerated repayment scenarios
+
+## Data Persistence
+
+### localStorage Strategy
+- Debounced updates (500ms delay) to avoid excessive writes
+- Individual keys for each input value
+- Graceful fallbacks for SSR and localStorage errors
+- Reset function clears all stored values
+
+### Storage Keys
 ```typescript
-const monthlyInterestRate = interestRate / 100 / 12;
-const numberOfPayments = loanTermYears * 12;
-
-const monthlyPayment = (calculatedLoanAmount *
-  (monthlyInterestRate * Math.pow(1 + monthlyInterestRate, numberOfPayments))) /
-  (Math.pow(1 + monthlyInterestRate, numberOfPayments) - 1);
+const STORAGE_KEYS = {
+  PROPERTY_PRICE: 'expense-calc-property-price',
+  STRATA: 'expense-calc-strata',
+  COUNCIL: 'expense-calc-council',
+  WATER: 'expense-calc-water',
+  DEPOSIT_PERCENTAGE: 'expense-calc-deposit-percentage',
+  INTEREST_RATE: 'expense-calc-interest-rate',
+  ADDITIONAL_REPAYMENT: 'expense-calc-additional-repayment',
+};
 ```
 
-## Quarterly Fee Conversions
-Quarterly fees are converted to monthly amounts by dividing by 3:
-- **Monthly Strata** = Quarterly Strata ÷ 3
-- **Monthly Council** = Quarterly Council ÷ 3
-- **Monthly Water** = Quarterly Water ÷ 3
+## Real-time Updates
 
-## Total Calculations
-### Monthly Total
-```
-Monthly Total = Monthly Mortgage + Monthly Strata + Monthly Council + Monthly Water
-```
+### useEffect Dependencies
+- Mortgage calculation: `[propertyPrice, depositPercentage, interestRate]`
+- Monthly total: `[monthlyMortgage, strata, council, water]`
+- Automatic recalculation when any input changes
 
-### Weekly Total
-```
-Weekly Total = (Monthly Total × 12) ÷ 52
-```
-This accounts for the fact that there are approximately 52.18 weeks in a year.
+### Calculation Flow
+1. Property price → Loan amount
+2. Loan amount + Interest rate → Monthly mortgage
+3. Monthly mortgage + Quarterly fees → Monthly total
+4. Monthly total → Weekly total
 
-## Calculation Triggers
-- **Mortgage calculations** trigger when `propertyPrice` changes
-- **Total expense calculations** trigger when any of these change:
-  - `monthlyMortgage`
-  - `strata` (quarterly)
-  - `council` (quarterly)
-  - `water` (quarterly)
+## Error Handling
 
-## Input Handling
-- All inputs accept comma-formatted numbers
-- String inputs are converted using `Number.parseFloat()` with fallback to 0
-- Numbers are formatted with `toLocaleString()` for display
-- Calculations only proceed when loan amount > 0
+### Input Validation
+- [src/lib/input-utils.ts](mdc:src/lib/input-utils.ts) - Handles number formatting and validation
+- Prevents invalid characters in numeric inputs
+- Graceful handling of empty or invalid values
 
-## Rounding Rules
-- Mortgage payments: Rounded to nearest dollar for display
-- Monthly totals: Rounded to nearest dollar for display
-- Weekly totals: Rounded to nearest dollar for display
-- Intermediate calculations maintain full precision
-
-## Validation Rules
-- All financial inputs must be non-negative
-- Empty inputs default to 0
-- Invalid inputs (non-numeric) default to 0
-
-## Persistence & State Management
-### LocalStorage Integration
-- **Storage Keys**: Organized with `expense-calc-` prefix for namespace isolation
-- **Debounced Saving**: 500ms delay to avoid performance issues during rapid input
-- **Hydration Safety**: Initial render uses default values, localStorage loads after client mount
-- **Error Handling**: Graceful fallbacks when localStorage is unavailable
-
-### Reset Functionality
-- **Immediate Reset**: No confirmation dialog for better UX
-- **Complete Clear**: Resets both component state and localStorage
-- **UI Reset**: All input fields return to default (0) state
-
-### State Architecture
-The custom hook `useExpenseCalculations` provides:
-- **State Management**: All calculation-related state in one place
-- **Computed Values**: Derived calculations (loan amount, totals)
-- **Side Effects**: Automatic recalculation when dependencies change
-- **Actions**: Reset function and state setters
-- **Constants**: Centralized financial parameters (interest rate, loan term, etc.)
+### Calculation Safety
+- Check for zero values before performing calculations
+- Handle division by zero scenarios
+- Default to zero for invalid calculations

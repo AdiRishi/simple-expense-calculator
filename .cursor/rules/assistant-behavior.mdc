@@ -3,28 +3,125 @@ description:
 globs:
 alwaysApply: false
 ---
-# Assistant Behavior Rules
+# Assistant Behavior - Simple Expense Calculator
 
-## Development Server
-- **NEVER** automatically run `npm run dev`, `yarn dev`, or any development server commands unless explicitly requested by the user
-- **NEVER** run commands in background mode unless specifically asked
-- Always ask the user if they want to start the dev server instead of assuming
+## Development Approach
 
-## Testing and Building
-- It's acceptable to run `npm run build` or similar build commands to check for compilation errors when requested or when it makes sense for verification
-- Always explain why you're running a build command before doing so
+### Code Changes
+- Always maintain TypeScript strict typing
+- Follow the established component patterns in [src/components/](mdc:src/components)
+- Use the existing calculation logic in [src/hooks/use-expense-calculations.ts](mdc:src/hooks/use-expense-calculations.ts)
+- Preserve the localStorage persistence pattern with debounced updates
 
-## Terminal Commands
-- Only run terminal commands that are necessary for the specific task
-- Avoid running long-running processes without explicit user permission
-- If a command might take a while or run indefinitely, always warn the user first
+### Component Development
+- Extend existing components rather than creating new ones when possible
+- Follow the prop interface patterns established in the codebase
+- Use shadcn/ui components from [src/components/ui/](mdc:src/components/ui) for consistency
+- Maintain responsive design with Tailwind CSS classes
 
-## Code Changes
-- Focus on making the requested changes efficiently
-- Test compilation with build commands when appropriate, but don't start servers
-- Provide clear explanations of what was changed and why
+### State Management
+- Centralize related state in custom hooks
+- Use the established pattern of state setters as props
+- Implement proper cleanup for useEffect hooks
+- Follow the existing localStorage patterns for data persistence
 
-## General Guidelines
-- Respect the user's development workflow
-- Don't make assumptions about what the user wants to run
-- Ask for clarification when in doubt about running commands
+## Testing and Validation
+
+### Manual Testing Approach
+- Test all calculation scenarios with various input values
+- Verify responsive design on different screen sizes
+- Validate localStorage persistence across browser sessions
+- Ensure proper input formatting and validation
+
+### Edge Cases to Consider
+- Zero and negative values in calculations
+- Large numbers that might cause formatting issues
+- Empty inputs and invalid data handling
+- Browser localStorage availability and errors
+
+### Calculation Verification
+- Verify mortgage calculations match standard formulas
+- Test quarterly fee conversions (divide by 3)
+- Validate weekly calculation: (monthly × 12) ÷ 52
+- Check additional repayment impact calculations
+
+## Maintenance Guidelines
+
+### Performance Optimization
+- Monitor useEffect dependencies to prevent unnecessary re-renders
+- Maintain debounced localStorage updates (500ms delay)
+- Optimize conditional rendering for better performance
+- Use proper cleanup in useEffect hooks
+
+### Code Quality
+- Run `pnpm lint` before suggesting changes
+- Use `pnpm format` to maintain consistent code style
+- Follow the import organization patterns established
+- Maintain TypeScript strict mode compliance
+
+### Feature Development
+- Extend the existing calculation logic rather than replacing it
+- Add new input fields following the established patterns
+- Implement new visualizations using the Recharts library
+- Maintain backward compatibility with existing localStorage data
+
+## User Experience Focus
+
+### Accessibility
+- Maintain proper label associations with form inputs
+- Use semantic HTML elements and ARIA attributes
+- Ensure keyboard navigation works correctly
+- Preserve color contrast and readability standards
+
+### Responsive Design
+- Test on mobile devices and tablets
+- Use established responsive patterns: `grid-cols-1 sm:grid-cols-2`
+- Maintain proper spacing and typography scaling
+- Ensure touch targets are appropriately sized
+
+### Data Persistence
+- Preserve user inputs across browser sessions
+- Implement graceful fallbacks when localStorage is unavailable
+- Provide clear reset functionality
+- Handle edge cases in data loading and saving
+
+## Error Handling Strategy
+
+### Input Validation
+- Use [src/lib/input-utils.ts](mdc:src/lib/input-utils.ts) for consistent handling
+- Provide immediate feedback for invalid inputs
+- Prevent application crashes from user input errors
+- Maintain functional state even with partial invalid data
+
+### Calculation Errors
+- Handle division by zero and mathematical edge cases
+- Provide sensible defaults for invalid calculations
+- Display error states clearly to users
+- Log errors for debugging while maintaining user experience
+
+### System Errors
+- Handle localStorage quota exceeded errors
+- Gracefully degrade when browser features are unavailable
+- Provide fallback behavior for unsupported features
+- Maintain core functionality even when enhancements fail
+
+## Development Workflow
+
+### Before Making Changes
+- Review the existing codebase structure and patterns
+- Understand the calculation logic and dependencies
+- Check for existing similar implementations
+- Consider impact on localStorage data and user sessions
+
+### When Adding Features
+- Follow the established component and hook patterns
+- Maintain backward compatibility with existing data
+- Update type definitions and interfaces as needed
+- Test with various input scenarios and edge cases
+
+### Code Review Checklist
+- TypeScript types are properly defined
+- useEffect dependencies are correct and complete
+- Responsive design works across screen sizes
+- localStorage integration follows established patterns
+- Calculations are mathematically correct and tested
