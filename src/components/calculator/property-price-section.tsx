@@ -8,10 +8,12 @@ interface PropertyPriceSectionProps {
   loanAmount: number;
   monthlyMortgage: number;
   depositPercentage: number;
+  depositAmount: number;
   interestRate: number;
   loanTermYears: number;
   setPropertyPrice: React.Dispatch<React.SetStateAction<number>>;
   setDepositPercentage: React.Dispatch<React.SetStateAction<number>>;
+  setDepositAmount: React.Dispatch<React.SetStateAction<number>>;
   setInterestRate: React.Dispatch<React.SetStateAction<number>>;
 }
 
@@ -20,10 +22,12 @@ export function PropertyPriceSection({
   loanAmount,
   monthlyMortgage,
   depositPercentage,
+  depositAmount,
   interestRate,
   loanTermYears,
   setPropertyPrice,
   setDepositPercentage,
+  setDepositAmount,
   setInterestRate,
 }: PropertyPriceSectionProps) {
   // Use the reusable hook to handle decimals gracefully without cluttering this component
@@ -32,6 +36,12 @@ export function PropertyPriceSection({
     onChange: handleInterestRateChange,
     onBlur: handleInterestRateBlur,
   } = useFormattedNumberInput(interestRate, setInterestRate);
+
+  const {
+    input: depositAmountInput,
+    onChange: handleDepositAmountChange,
+    onBlur: handleDepositAmountBlur,
+  } = useFormattedNumberInput(depositAmount, setDepositAmount);
 
   return (
     <div className="bg-muted/50 space-y-4 rounded-lg p-3 sm:p-4">
@@ -48,20 +58,42 @@ export function PropertyPriceSection({
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="deposit-percentage">Deposit (%)</Label>
-          <Input
-            id="deposit-percentage"
-            type="text"
-            min="0"
-            max="100"
-            placeholder="5"
-            value={depositPercentage.toLocaleString()}
-            onChange={handleInputChange(setDepositPercentage)}
-            onBlur={handleInputBlur}
-          />
+      <div className="space-y-4">
+        <div className="space-y-3">
+          <Label className="text-sm font-medium">Deposit</Label>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="deposit-percentage" className="text-muted-foreground text-xs">
+                Percentage (%)
+              </Label>
+              <Input
+                id="deposit-percentage"
+                type="text"
+                min="0"
+                max="100"
+                placeholder="5"
+                value={depositPercentage.toLocaleString()}
+                onChange={handleInputChange(setDepositPercentage)}
+                onBlur={handleInputBlur}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="deposit-amount" className="text-muted-foreground text-xs">
+                Amount ($)
+              </Label>
+              <Input
+                id="deposit-amount"
+                type="text"
+                min="0"
+                placeholder="0"
+                value={depositAmountInput}
+                onChange={handleDepositAmountChange}
+                onBlur={handleDepositAmountBlur}
+              />
+            </div>
+          </div>
         </div>
+
         <div className="space-y-2">
           <Label htmlFor="interest-rate">Interest Rate (% p.a.)</Label>
           <Input
@@ -79,8 +111,10 @@ export function PropertyPriceSection({
       {propertyPrice > 0 && (
         <div className="grid grid-cols-1 gap-4 text-sm sm:grid-cols-2">
           <div>
-            <p className="text-muted-foreground">Deposit ({depositPercentage}%)</p>
-            <p className="font-medium">${(propertyPrice * (depositPercentage / 100)).toLocaleString()}</p>
+            <p className="text-muted-foreground">Deposit</p>
+            <p className="font-medium">
+              ${depositAmount.toLocaleString()} ({depositPercentage.toFixed(1)}%)
+            </p>
           </div>
           <div>
             <p className="text-muted-foreground">Loan Amount</p>

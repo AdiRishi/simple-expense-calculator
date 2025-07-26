@@ -8,6 +8,7 @@ const STORAGE_KEYS = {
   COUNCIL: 'expense-calc-council',
   WATER: 'expense-calc-water',
   DEPOSIT_PERCENTAGE: 'expense-calc-deposit-percentage',
+  DEPOSIT_AMOUNT: 'expense-calc-deposit-amount',
   INTEREST_RATE: 'expense-calc-interest-rate',
   ADDITIONAL_REPAYMENT: 'expense-calc-additional-repayment',
 };
@@ -42,6 +43,7 @@ export interface ExpenseCalculations {
   monthlyTotal: number;
   weeklyTotal: number;
   depositPercentage: number;
+  depositAmount: number;
   interestRate: number;
   loanTermYears: number;
   additionalRepayment: number;
@@ -50,6 +52,7 @@ export interface ExpenseCalculations {
   setCouncil: React.Dispatch<React.SetStateAction<number>>;
   setWater: React.Dispatch<React.SetStateAction<number>>;
   setDepositPercentage: React.Dispatch<React.SetStateAction<number>>;
+  setDepositAmount: React.Dispatch<React.SetStateAction<number>>;
   setInterestRate: React.Dispatch<React.SetStateAction<number>>;
   setAdditionalRepayment: React.Dispatch<React.SetStateAction<number>>;
   resetAll: () => void;
@@ -61,6 +64,7 @@ export function useExpenseCalculations(): ExpenseCalculations {
   const [council, setCouncil] = useState<number>(0);
   const [water, setWater] = useState<number>(0);
   const [depositPercentage, setDepositPercentage] = useState<number>(5);
+  const [depositAmount, setDepositAmount] = useState<number>(0);
   const [interestRate, setInterestRate] = useState<number>(5.68);
   const [additionalRepayment, setAdditionalRepayment] = useState<number>(0);
 
@@ -71,6 +75,7 @@ export function useExpenseCalculations(): ExpenseCalculations {
     setCouncil(getStoredValue(STORAGE_KEYS.COUNCIL, 0));
     setWater(getStoredValue(STORAGE_KEYS.WATER, 0));
     setDepositPercentage(getStoredValue(STORAGE_KEYS.DEPOSIT_PERCENTAGE, 5));
+    setDepositAmount(getStoredValue(STORAGE_KEYS.DEPOSIT_AMOUNT, 0));
     setInterestRate(getStoredValue(STORAGE_KEYS.INTEREST_RATE, 5.68));
     setAdditionalRepayment(getStoredValue(STORAGE_KEYS.ADDITIONAL_REPAYMENT, 0));
   }, []);
@@ -83,10 +88,41 @@ export function useExpenseCalculations(): ExpenseCalculations {
   // Fixed value
   const loanTermYears = 30;
 
+  // Custom setters that handle synchronization
+  const setDepositPercentageWithSync: React.Dispatch<React.SetStateAction<number>> = (value) => {
+    const percentage = typeof value === 'function' ? value(depositPercentage) : value;
+    setDepositPercentage(percentage);
+    if (propertyPrice > 0) {
+      const calculatedDepositAmount = propertyPrice * (percentage / 100);
+      setDepositAmount(calculatedDepositAmount);
+    }
+  };
+
+  const setDepositAmountWithSync: React.Dispatch<React.SetStateAction<number>> = (value) => {
+    const amount = typeof value === 'function' ? value(depositAmount) : value;
+    // Cap deposit amount at property price (if property price is set)
+    const cappedAmount = propertyPrice > 0 ? Math.min(amount, propertyPrice) : amount;
+    setDepositAmount(cappedAmount);
+    if (propertyPrice > 0) {
+      const calculatedDepositPercentage = (cappedAmount / propertyPrice) * 100;
+      setDepositPercentage(calculatedDepositPercentage);
+    }
+  };
+
+  // Synchronize when property price changes
   useEffect(() => {
-    // Calculate loan amount based on deposit percentage
-    const calculatedLoanAmount = propertyPrice * (1 - depositPercentage / 100);
-    setLoanAmount(calculatedLoanAmount);
+    if (propertyPrice > 0) {
+      const calculatedDepositAmount = propertyPrice * (depositPercentage / 100);
+      setDepositAmount(calculatedDepositAmount);
+    } else {
+      setDepositAmount(0);
+    }
+  }, [propertyPrice, depositPercentage]);
+
+  useEffect(() => {
+    // Calculate loan amount based on deposit amount
+    const calculatedLoanAmount = propertyPrice - depositAmount;
+    setLoanAmount(Math.max(0, calculatedLoanAmount));
 
     // Calculate monthly mortgage payment using standard mortgage formula
     // M = P * [r(1+r)^n] / [(1+r)^n - 1]
@@ -102,7 +138,7 @@ export function useExpenseCalculations(): ExpenseCalculations {
     } else {
       setMonthlyMortgage(0);
     }
-  }, [propertyPrice, depositPercentage, interestRate]);
+  }, [propertyPrice, depositAmount, interestRate]);
 
   useEffect(() => {
     // Convert quarterly fees to monthly by dividing by 3
@@ -157,6 +193,13 @@ export function useExpenseCalculations(): ExpenseCalculations {
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
+      setStoredValue(STORAGE_KEYS.DEPOSIT_AMOUNT, depositAmount);
+    }, 500);
+    return () => clearTimeout(timeoutId);
+  }, [depositAmount]);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
       setStoredValue(STORAGE_KEYS.INTEREST_RATE, interestRate);
     }, 500);
     return () => clearTimeout(timeoutId);
@@ -176,6 +219,7 @@ export function useExpenseCalculations(): ExpenseCalculations {
     setCouncil(0);
     setWater(0);
     setDepositPercentage(5);
+    setDepositAmount(0);
     setInterestRate(5.68);
     setAdditionalRepayment(0);
 
@@ -201,6 +245,7 @@ export function useExpenseCalculations(): ExpenseCalculations {
     monthlyTotal,
     weeklyTotal,
     depositPercentage,
+    depositAmount,
     interestRate,
     loanTermYears,
     additionalRepayment,
@@ -208,7 +253,8 @@ export function useExpenseCalculations(): ExpenseCalculations {
     setStrata,
     setCouncil,
     setWater,
-    setDepositPercentage,
+    setDepositPercentage: setDepositPercentageWithSync,
+    setDepositAmount: setDepositAmountWithSync,
     setInterestRate,
     setAdditionalRepayment,
     resetAll,

@@ -36,10 +36,12 @@ export function ExpenseCalculator() {
             loanAmount={calculations.loanAmount}
             monthlyMortgage={calculations.monthlyMortgage}
             depositPercentage={calculations.depositPercentage}
+            depositAmount={calculations.depositAmount}
             interestRate={calculations.interestRate}
             loanTermYears={calculations.loanTermYears}
             setPropertyPrice={calculations.setPropertyPrice}
             setDepositPercentage={calculations.setDepositPercentage}
+            setDepositAmount={calculations.setDepositAmount}
             setInterestRate={calculations.setInterestRate}
           />
 
