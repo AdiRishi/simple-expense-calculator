@@ -81,6 +81,8 @@ export function ExpenseCalculator() {
           loanTermYears={calculations.loanTermYears}
           additionalRepayment={calculations.additionalRepayment}
           setAdditionalRepayment={calculations.setAdditionalRepayment}
+          offsetAmount={calculations.offsetAmount}
+          setOffsetAmount={calculations.setOffsetAmount}
         />
       )}
     </div>

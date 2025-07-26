@@ -28,7 +28,8 @@ export function useRepaymentCalculations(
   monthlyMortgage: number,
   interestRate: number,
   loanTermYears: number,
-  additionalRepayment: number
+  additionalRepayment: number,
+  offsetAmount: number = 0
 ): RepaymentCalculations {
   const repaymentData = useMemo(() => {
     if (loanAmount <= 0 || monthlyMortgage <= 0) {
@@ -38,7 +39,9 @@ export function useRepaymentCalculations(
     const monthlyRate = interestRate / 100 / 12;
 
     // Check if the monthly payment is sufficient to cover interest
-    const initialMonthlyInterest = loanAmount * monthlyRate;
+    // Use effective balance (loan - offset) for interest calculation
+    const effectiveBalance = Math.max(0, loanAmount - offsetAmount);
+    const initialMonthlyInterest = effectiveBalance * monthlyRate;
     if (monthlyMortgage <= initialMonthlyInterest) {
       return []; // Return empty data if payment is insufficient
     }
@@ -65,7 +68,9 @@ export function useRepaymentCalculations(
       for (let month = 0; month < 12; month++) {
         // Standard repayment
         if (standardBalance > 0) {
-          const standardInterestPayment = standardBalance * monthlyRate;
+          // Interest is calculated on (balance - offset), but offset doesn't reduce the actual balance
+          const effectiveStandardBalance = Math.max(0, standardBalance - offsetAmount);
+          const standardInterestPayment = effectiveStandardBalance * monthlyRate;
           const standardPrincipalPayment = monthlyMortgage - standardInterestPayment;
 
           if (standardPrincipalPayment <= 0) break; // Safety check for negative amortization
@@ -75,7 +80,9 @@ export function useRepaymentCalculations(
 
         // With additional repayment
         if (withExtraBalance > 0) {
-          const extraInterestPayment = withExtraBalance * monthlyRate;
+          // Interest is calculated on (balance - offset), but offset doesn't reduce the actual balance
+          const effectiveExtraBalance = Math.max(0, withExtraBalance - offsetAmount);
+          const extraInterestPayment = effectiveExtraBalance * monthlyRate;
           const extraPrincipalPayment = monthlyMortgage - extraInterestPayment + additionalRepayment;
 
           if (extraPrincipalPayment <= 0) break; // Safety check for negative amortization
@@ -91,7 +98,7 @@ export function useRepaymentCalculations(
     }
 
     return data;
-  }, [loanAmount, monthlyMortgage, interestRate, loanTermYears, additionalRepayment]);
+  }, [loanAmount, monthlyMortgage, interestRate, loanTermYears, additionalRepayment, offsetAmount]);
 
   const loanMetrics = useMemo(() => {
     if (loanAmount <= 0 || monthlyMortgage <= 0) {
@@ -110,8 +117,9 @@ export function useRepaymentCalculations(
 
     const monthlyRate = interestRate / 100 / 12;
 
-    // Check if the monthly payment is sufficient to cover interest on the initial loan
-    const initialMonthlyInterest = loanAmount * monthlyRate;
+    // Check if the monthly payment is sufficient to cover interest on the initial effective loan
+    const effectiveBalance = Math.max(0, loanAmount - offsetAmount);
+    const initialMonthlyInterest = effectiveBalance * monthlyRate;
     if (monthlyMortgage <= initialMonthlyInterest) {
       // Payment is insufficient - return zero values to avoid infinite loops
       return {
@@ -133,7 +141,9 @@ export function useRepaymentCalculations(
     let standardMonths = 0;
 
     while (standardBalance > 0.01 && standardMonths < loanTermYears * 12) {
-      const interestPayment = standardBalance * monthlyRate;
+      // Interest is calculated on (balance - offset)
+      const effectiveStandardBalance = Math.max(0, standardBalance - offsetAmount);
+      const interestPayment = effectiveStandardBalance * monthlyRate;
       const principalPayment = monthlyMortgage - interestPayment;
 
       if (principalPayment <= 0) break; // Safety check for negative amortization
@@ -153,7 +163,9 @@ export function useRepaymentCalculations(
 
     if (additionalRepayment > 0) {
       while (extraBalance > 0.01 && extraMonths < loanTermYears * 12) {
-        const interestPayment = extraBalance * monthlyRate;
+        // Interest is calculated on (balance - offset)
+        const effectiveExtraBalance = Math.max(0, extraBalance - offsetAmount);
+        const interestPayment = effectiveExtraBalance * monthlyRate;
         const principalPayment = monthlyMortgage - interestPayment + additionalRepayment;
 
         if (principalPayment <= 0) break; // Safety check for negative amortization
@@ -184,7 +196,7 @@ export function useRepaymentCalculations(
       standardTermMonths: standardMonths,
       extraTermMonths: extraMonths,
     };
-  }, [loanAmount, monthlyMortgage, interestRate, loanTermYears, additionalRepayment]);
+  }, [loanAmount, monthlyMortgage, interestRate, loanTermYears, additionalRepayment, offsetAmount]);
 
   return {
     repaymentData,

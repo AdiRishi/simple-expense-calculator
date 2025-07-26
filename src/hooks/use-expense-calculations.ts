@@ -11,6 +11,7 @@ const STORAGE_KEYS = {
   DEPOSIT_AMOUNT: 'expense-calc-deposit-amount',
   INTEREST_RATE: 'expense-calc-interest-rate',
   ADDITIONAL_REPAYMENT: 'expense-calc-additional-repayment',
+  OFFSET_AMOUNT: 'expense-calc-offset-amount',
   WEEKLY_RENT: 'expense-calc-weekly-rent',
   MANAGEMENT_FEE_PERCENTAGE: 'expense-calc-management-fee-percentage',
 };
@@ -53,6 +54,7 @@ export interface ExpenseCalculations {
   interestRate: number;
   loanTermYears: number;
   additionalRepayment: number;
+  offsetAmount: number;
   setPropertyPrice: React.Dispatch<React.SetStateAction<number>>;
   setStrata: React.Dispatch<React.SetStateAction<number>>;
   setCouncil: React.Dispatch<React.SetStateAction<number>>;
@@ -63,6 +65,7 @@ export interface ExpenseCalculations {
   setDepositAmount: React.Dispatch<React.SetStateAction<number>>;
   setInterestRate: React.Dispatch<React.SetStateAction<number>>;
   setAdditionalRepayment: React.Dispatch<React.SetStateAction<number>>;
+  setOffsetAmount: React.Dispatch<React.SetStateAction<number>>;
   resetAll: () => void;
 }
 
@@ -77,6 +80,7 @@ export function useExpenseCalculations(): ExpenseCalculations {
   const [depositAmount, setDepositAmount] = useState<number>(0);
   const [interestRate, setInterestRate] = useState<number>(5.68);
   const [additionalRepayment, setAdditionalRepayment] = useState<number>(0);
+  const [offsetAmount, setOffsetAmount] = useState<number>(0);
 
   // Load from localStorage after client-side hydration
   useEffect(() => {
@@ -90,6 +94,7 @@ export function useExpenseCalculations(): ExpenseCalculations {
     setDepositAmount(getStoredValue(STORAGE_KEYS.DEPOSIT_AMOUNT, 0));
     setInterestRate(getStoredValue(STORAGE_KEYS.INTEREST_RATE, 5.68));
     setAdditionalRepayment(getStoredValue(STORAGE_KEYS.ADDITIONAL_REPAYMENT, 0));
+    setOffsetAmount(getStoredValue(STORAGE_KEYS.OFFSET_AMOUNT, 0));
   }, []);
 
   const [loanAmount, setLoanAmount] = useState<number>(0);
@@ -241,6 +246,13 @@ export function useExpenseCalculations(): ExpenseCalculations {
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
+      setStoredValue(STORAGE_KEYS.OFFSET_AMOUNT, offsetAmount);
+    }, 500);
+    return () => clearTimeout(timeoutId);
+  }, [offsetAmount]);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
       setStoredValue(STORAGE_KEYS.WEEKLY_RENT, weeklyRent);
     }, 500);
     return () => clearTimeout(timeoutId);
@@ -265,6 +277,7 @@ export function useExpenseCalculations(): ExpenseCalculations {
     setDepositAmount(0);
     setInterestRate(5.68);
     setAdditionalRepayment(0);
+    setOffsetAmount(0);
 
     // Clear from localStorage
     Object.values(STORAGE_KEYS).forEach((key) => {
@@ -296,6 +309,7 @@ export function useExpenseCalculations(): ExpenseCalculations {
     interestRate,
     loanTermYears,
     additionalRepayment,
+    offsetAmount,
     setPropertyPrice,
     setStrata,
     setCouncil,
@@ -306,6 +320,7 @@ export function useExpenseCalculations(): ExpenseCalculations {
     setDepositAmount: setDepositAmountWithSync,
     setInterestRate,
     setAdditionalRepayment,
+    setOffsetAmount,
     resetAll,
   };
 }

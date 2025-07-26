@@ -23,6 +23,8 @@ interface RepaymentGraphProps {
   loanTermYears: number;
   additionalRepayment: number;
   setAdditionalRepayment: React.Dispatch<React.SetStateAction<number>>;
+  offsetAmount: number;
+  setOffsetAmount: React.Dispatch<React.SetStateAction<number>>;
 }
 
 export function RepaymentGraph({
@@ -32,6 +34,8 @@ export function RepaymentGraph({
   loanTermYears,
   additionalRepayment,
   setAdditionalRepayment,
+  offsetAmount,
+  setOffsetAmount,
 }: RepaymentGraphProps) {
   const chartConfig = {
     standardBalance: {
@@ -49,7 +53,8 @@ export function RepaymentGraph({
     monthlyMortgage,
     interestRate,
     loanTermYears,
-    additionalRepayment
+    additionalRepayment,
+    offsetAmount
   );
 
   if (loanAmount <= 0) {
@@ -70,17 +75,31 @@ export function RepaymentGraph({
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="space-y-2">
-          <Label htmlFor="additional-repayment">Additional Monthly Repayment ($)</Label>
-          <Input
-            id="additional-repayment"
-            type="text"
-            min="0"
-            placeholder="0"
-            value={additionalRepayment.toLocaleString()}
-            onChange={handleInputChange(setAdditionalRepayment)}
-            onBlur={handleInputBlur}
-          />
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="additional-repayment">Additional Monthly Repayment ($)</Label>
+            <Input
+              id="additional-repayment"
+              type="text"
+              min="0"
+              placeholder="0"
+              value={additionalRepayment.toLocaleString()}
+              onChange={handleInputChange(setAdditionalRepayment)}
+              onBlur={handleInputBlur}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="offset-amount">Offset Account Balance ($)</Label>
+            <Input
+              id="offset-amount"
+              type="text"
+              min="0"
+              placeholder="0"
+              value={offsetAmount.toLocaleString()}
+              onChange={handleInputChange(setOffsetAmount)}
+              onBlur={handleInputBlur}
+            />
+          </div>
         </div>
 
         {/* Loan Summary Information */}
@@ -95,6 +114,9 @@ export function RepaymentGraph({
                 <p className="text-lg font-bold">${monthlyMortgage.toFixed(0)}</p>
                 {additionalRepayment > 0 && (
                   <p className="text-muted-foreground text-xs">+ ${additionalRepayment.toLocaleString()} extra</p>
+                )}
+                {offsetAmount > 0 && (
+                  <p className="text-muted-foreground text-xs">${offsetAmount.toLocaleString()} offset account</p>
                 )}
               </div>
 
