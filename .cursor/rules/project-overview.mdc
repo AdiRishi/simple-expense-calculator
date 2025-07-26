@@ -1,30 +1,31 @@
----
-description:
-globs:
-alwaysApply: false
----
 # Project Overview - Simple Expense Calculator
 
 ## Purpose
-A modern, responsive property expense calculator built with Next.js 15, React 19, and Tailwind CSS that helps users calculate monthly and weekly property expenses including mortgage payments, strata fees, council rates, and water fees.
+
+A modern, responsive property expense calculator built with Next.js 15, React 19, and Tailwind CSS that helps users calculate monthly and weekly property expenses including mortgage payments, strata fees, council rates, water fees, and rental income with net expense calculations.
 
 ## Key Features
+
 - Property price and mortgage calculations with configurable deposit and interest rates
 - Quarterly fees support (strata, council, water) automatically converted to monthly
+- Rental income calculations with weekly rent and management agency fee deductions
+- Net expense calculations showing actual out-of-pocket costs after rental income
 - Interactive loan repayment graph with additional payment scenarios
 - Real-time calculations with data persistence using localStorage
 - Responsive design using shadcn/ui components
 - Modern UI with clean, accessible interface
 
 ## Project Structure
+
 - [src/app/page.tsx](mdc:src/app/page.tsx) - Main entry point with ExpenseCalculator component
-- [src/components/calculator/](mdc:src/components/calculator) - Input components for property price and fees
+- [src/components/calculator/](mdc:src/components/calculator) - Input components for property price, fees, and rental income
 - [src/components/results/](mdc:src/components/results) - Results display and visualization components
 - [src/components/ui/](mdc:src/components/ui) - Reusable shadcn/ui components (30+ components)
 - [src/hooks/](mdc:src/hooks) - Custom React hooks for calculations and responsive design
 - [src/lib/](mdc:src/lib) - Utility functions for input handling and styling
 
 ## Tech Stack
+
 - **Framework**: Next.js 15 with App Router and Turbopack
 - **UI**: React 19, TypeScript, Tailwind CSS 4
 - **Components**: Radix UI primitives with shadcn/ui styling
@@ -33,12 +34,16 @@ A modern, responsive property expense calculator built with Next.js 15, React 19
 - **Package Manager**: pnpm
 
 ## Core Calculations
+
 - **Mortgage**: Standard compound interest formula over 30 years
 - **Quarterly Fees**: Divided by 3 for monthly amounts
 - **Weekly Expenses**: (Monthly total × 12) ÷ 52
+- **Rental Income**: (Weekly rent × 52 ÷ 12) × (1 - management fee %)
+- **Net Expenses**: Monthly expenses - Monthly rental income
 - **Additional Repayments**: Shows interest savings and time reduction
 
 ## Development Scripts
+
 - `pnpm dev` - Development server with Turbopack
 - `pnpm build` - Production build
 - `pnpm lint` - ESLint code linting

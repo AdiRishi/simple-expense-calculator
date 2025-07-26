@@ -1,76 +1,92 @@
----
-description:
-globs:
-alwaysApply: false
----
 # Component Patterns - Simple Expense Calculator
 
 ## Component Architecture
 
 ### Main Calculator Component
+
 - [src/components/calculator/expense-calculator.tsx](mdc:src/components/calculator/expense-calculator.tsx) - Root calculator component that orchestrates all child components
 - Uses the `useExpenseCalculations` hook for state management
 - Implements responsive design with card-based layout
 - Includes reset functionality and conditional rendering
 
 ### Input Components
+
 - [src/components/calculator/property-price-section.tsx](mdc:src/components/calculator/property-price-section.tsx) - Property price, deposit, and interest rate inputs
 - [src/components/calculator/quarterly-fees-section.tsx](mdc:src/components/calculator/quarterly-fees-section.tsx) - Strata, council, and water fee inputs
-- Both use formatted number inputs with locale formatting
+- [src/components/calculator/rental-income-section.tsx](mdc:src/components/calculator/rental-income-section.tsx) - Weekly rent and management agency fee inputs
+- All use formatted number inputs with locale formatting and decimal support
 
 ### Results Components
-- [src/components/results/expense-results.tsx](mdc:src/components/results/expense-results.tsx) - Summary of monthly/weekly totals
+
+- [src/components/results/expense-results.tsx](mdc:src/components/results/expense-results.tsx) - Summary of monthly/weekly totals plus rental income and net expenses
 - [src/components/results/repayment-graph.tsx](mdc:src/components/results/repayment-graph.tsx) - Interactive loan visualization
 
 ## Component Patterns
 
 ### Props Interface Pattern
+
 ```typescript
 interface ComponentNameProps {
-  // Primitive values
-  value: number;
-  // State setters
-  setValue: React.Dispatch<React.SetStateAction<number>>;
-  // Calculated values (read-only)
-  calculatedValue: number;
+    // Primitive values
+    value: number;
+    // State setters
+    setValue: React.Dispatch<React.SetStateAction<number>>;
+    // Calculated values (read-only)
+    calculatedValue: number;
 }
 ```
 
 ### Conditional Rendering Pattern
+
 - Use `{condition && <Component />}` for simple conditional rendering
 - Display calculated results only when input values are provided
 - Show loan graph only when loan amount > 0
+- Show rental income results only when weeklyRent > 0
 
 ### Input Handling Pattern
+
 - Use [src/lib/input-utils.ts](mdc:src/lib/input-utils.ts) for consistent number input formatting
 - Implement `handleInputChange` and `handleInputBlur` for number inputs
-- Use `useFormattedNumberInput` hook for decimal value inputs
+- Use `useFormattedNumberInput` hook for decimal value inputs (percentages, interest rates)
+- Format currency values with `toLocaleString()` for display
 
 ### State Management Pattern
+
 - Centralized state in `useExpenseCalculations` hook
 - Local state for derived calculations
 - Persistence through localStorage with debounced updates
+- Separate calculations for rental income and net expenses
 
 ## UI Component Usage
 
 ### shadcn/ui Components
+
 - `Card` - Main container with header and content sections
 - `Input` + `Label` - Form inputs with proper accessibility
 - `Button` - Actions like reset with icon + text pattern
 - Responsive grid layouts using Tailwind CSS classes
 
 ### Styling Conventions
+
 - Use `bg-muted/50` for input section backgrounds
 - Use `text-muted-foreground` for secondary text
 - Use `font-medium` and `font-bold` for emphasis
+- Use `text-green-600` for positive values like rental income
 - Implement responsive spacing with `space-y-4 sm:space-y-6`
 
 ### Icon Usage
+
 - Import icons from `lucide-react`
 - Use consistent sizing with `h-4 w-4` or `h-5 w-5`
 - Combine icons with text in buttons and headers
+- Use semantic icons: `Calculator` for fees, `DollarSign` for income, `Home` for property
 
 ## Export/Import Pattern
+
+- Use named exports for all components
+- Create index files for cleaner imports
+- Export types alongside components when needed
+
 - Use named exports for all components
 - Create index files for cleaner imports
 - Export types alongside components when needed
