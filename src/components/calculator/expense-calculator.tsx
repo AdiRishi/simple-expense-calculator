@@ -8,6 +8,7 @@ import { useExpenseCalculations } from '@/hooks/use-expense-calculations';
 import { Home, RotateCcw } from 'lucide-react';
 import { PropertyPriceSection } from './property-price-section';
 import { QuarterlyFeesSection } from './quarterly-fees-section';
+import { RentalIncomeSection } from './rental-income-section';
 
 export function ExpenseCalculator() {
   const calculations = useExpenseCalculations();
@@ -53,11 +54,20 @@ export function ExpenseCalculator() {
             setCouncil={calculations.setCouncil}
             setWater={calculations.setWater}
           />
+
+          <RentalIncomeSection
+            weeklyRent={calculations.weeklyRent}
+            managementFeePercentage={calculations.managementFeePercentage}
+            setWeeklyRent={calculations.setWeeklyRent}
+            setManagementFeePercentage={calculations.setManagementFeePercentage}
+          />
         </CardContent>
 
         <ExpenseResults
           monthlyTotal={calculations.monthlyTotal}
           weeklyTotal={calculations.weeklyTotal}
+          monthlyRentalIncome={calculations.monthlyRentalIncome}
+          netMonthlyExpenses={calculations.netMonthlyExpenses}
           depositPercentage={calculations.depositPercentage}
           interestRate={calculations.interestRate}
         />

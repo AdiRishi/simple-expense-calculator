@@ -11,6 +11,8 @@ const STORAGE_KEYS = {
   DEPOSIT_AMOUNT: 'expense-calc-deposit-amount',
   INTEREST_RATE: 'expense-calc-interest-rate',
   ADDITIONAL_REPAYMENT: 'expense-calc-additional-repayment',
+  WEEKLY_RENT: 'expense-calc-weekly-rent',
+  MANAGEMENT_FEE_PERCENTAGE: 'expense-calc-management-fee-percentage',
 };
 
 // Helper functions for localStorage
@@ -38,10 +40,14 @@ export interface ExpenseCalculations {
   strata: number;
   council: number;
   water: number;
+  weeklyRent: number;
+  managementFeePercentage: number;
   loanAmount: number;
   monthlyMortgage: number;
   monthlyTotal: number;
   weeklyTotal: number;
+  monthlyRentalIncome: number;
+  netMonthlyExpenses: number;
   depositPercentage: number;
   depositAmount: number;
   interestRate: number;
@@ -51,6 +57,8 @@ export interface ExpenseCalculations {
   setStrata: React.Dispatch<React.SetStateAction<number>>;
   setCouncil: React.Dispatch<React.SetStateAction<number>>;
   setWater: React.Dispatch<React.SetStateAction<number>>;
+  setWeeklyRent: React.Dispatch<React.SetStateAction<number>>;
+  setManagementFeePercentage: React.Dispatch<React.SetStateAction<number>>;
   setDepositPercentage: React.Dispatch<React.SetStateAction<number>>;
   setDepositAmount: React.Dispatch<React.SetStateAction<number>>;
   setInterestRate: React.Dispatch<React.SetStateAction<number>>;
@@ -63,6 +71,8 @@ export function useExpenseCalculations(): ExpenseCalculations {
   const [strata, setStrata] = useState<number>(0);
   const [council, setCouncil] = useState<number>(0);
   const [water, setWater] = useState<number>(0);
+  const [weeklyRent, setWeeklyRent] = useState<number>(0);
+  const [managementFeePercentage, setManagementFeePercentage] = useState<number>(0);
   const [depositPercentage, setDepositPercentage] = useState<number>(5);
   const [depositAmount, setDepositAmount] = useState<number>(0);
   const [interestRate, setInterestRate] = useState<number>(5.68);
@@ -74,6 +84,8 @@ export function useExpenseCalculations(): ExpenseCalculations {
     setStrata(getStoredValue(STORAGE_KEYS.STRATA, 0));
     setCouncil(getStoredValue(STORAGE_KEYS.COUNCIL, 0));
     setWater(getStoredValue(STORAGE_KEYS.WATER, 0));
+    setWeeklyRent(getStoredValue(STORAGE_KEYS.WEEKLY_RENT, 0));
+    setManagementFeePercentage(getStoredValue(STORAGE_KEYS.MANAGEMENT_FEE_PERCENTAGE, 0));
     setDepositPercentage(getStoredValue(STORAGE_KEYS.DEPOSIT_PERCENTAGE, 5));
     setDepositAmount(getStoredValue(STORAGE_KEYS.DEPOSIT_AMOUNT, 0));
     setInterestRate(getStoredValue(STORAGE_KEYS.INTEREST_RATE, 5.68));
@@ -84,6 +96,8 @@ export function useExpenseCalculations(): ExpenseCalculations {
   const [monthlyMortgage, setMonthlyMortgage] = useState<number>(0);
   const [monthlyTotal, setMonthlyTotal] = useState<number>(0);
   const [weeklyTotal, setWeeklyTotal] = useState<number>(0);
+  const [monthlyRentalIncome, setMonthlyRentalIncome] = useState<number>(0);
+  const [netMonthlyExpenses, setNetMonthlyExpenses] = useState<number>(0);
 
   // Fixed value
   const loanTermYears = 30;
@@ -155,6 +169,19 @@ export function useExpenseCalculations(): ExpenseCalculations {
     setWeeklyTotal(weekly);
   }, [monthlyMortgage, strata, council, water]);
 
+  useEffect(() => {
+    // Calculate monthly rental income
+    // Weekly rent * 52 weeks / 12 months = monthly gross rental income
+    // Then subtract management fee percentage
+    const monthlyGrossRentalIncome = (weeklyRent * 52) / 12;
+    const netRentalIncome = monthlyGrossRentalIncome * (1 - managementFeePercentage / 100);
+    setMonthlyRentalIncome(netRentalIncome);
+
+    // Calculate net monthly expenses (expenses - rental income)
+    const netExpenses = monthlyTotal - netRentalIncome;
+    setNetMonthlyExpenses(netExpenses);
+  }, [weeklyRent, managementFeePercentage, monthlyTotal]);
+
   // Save to localStorage when values change (debounced to avoid blocking input)
   useEffect(() => {
     const timeoutId = setTimeout(() => {
@@ -212,12 +239,28 @@ export function useExpenseCalculations(): ExpenseCalculations {
     return () => clearTimeout(timeoutId);
   }, [additionalRepayment]);
 
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setStoredValue(STORAGE_KEYS.WEEKLY_RENT, weeklyRent);
+    }, 500);
+    return () => clearTimeout(timeoutId);
+  }, [weeklyRent]);
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setStoredValue(STORAGE_KEYS.MANAGEMENT_FEE_PERCENTAGE, managementFeePercentage);
+    }, 500);
+    return () => clearTimeout(timeoutId);
+  }, [managementFeePercentage]);
+
   // Reset function to clear all values
   const resetAll = () => {
     setPropertyPrice(0);
     setStrata(0);
     setCouncil(0);
     setWater(0);
+    setWeeklyRent(0);
+    setManagementFeePercentage(0);
     setDepositPercentage(5);
     setDepositAmount(0);
     setInterestRate(5.68);
@@ -240,10 +283,14 @@ export function useExpenseCalculations(): ExpenseCalculations {
     strata,
     council,
     water,
+    weeklyRent,
+    managementFeePercentage,
     loanAmount,
     monthlyMortgage,
     monthlyTotal,
     weeklyTotal,
+    monthlyRentalIncome,
+    netMonthlyExpenses,
     depositPercentage,
     depositAmount,
     interestRate,
@@ -253,6 +300,8 @@ export function useExpenseCalculations(): ExpenseCalculations {
     setStrata,
     setCouncil,
     setWater,
+    setWeeklyRent,
+    setManagementFeePercentage,
     setDepositPercentage: setDepositPercentageWithSync,
     setDepositAmount: setDepositAmountWithSync,
     setInterestRate,
